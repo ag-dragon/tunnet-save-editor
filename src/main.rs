@@ -65,7 +65,7 @@ fn ui(mut commands: Commands, asset_server: Res<AssetServer>) {
         // UI Box
         parent.spawn(NodeBundle {
             style: Style {
-                width: Val::Px(200.0),
+                width: Val::Px(600.0),
                 border: UiRect::all(Val::Px(2.0)),
                 justify_content: JustifyContent::Start,
                 flex_direction: FlexDirection::Column,
@@ -79,7 +79,7 @@ fn ui(mut commands: Commands, asset_server: Res<AssetServer>) {
             parent.spawn(NodeBundle {
                 style: Style {
                     width: Val::Percent(100.0),
-                    height: Val::Px(20.0),
+                    height: Val::Px(30.0),
                     border: UiRect::bottom(Val::Px(2.0)),
                     ..default()
                 },
@@ -137,12 +137,139 @@ fn ui(mut commands: Commands, asset_server: Res<AssetServer>) {
             parent.spawn(NodeBundle {
                 style: Style {
                     width: Val::Percent(100.0),
-                    height: Val::Px(20.0),
+                    height: Val::Px(30.0),
                     border: UiRect::bottom(Val::Px(2.0)),
                     ..default()
                 },
                 border_color: Color::hex("454545FF").unwrap().into(),
                 ..default()
+            }).with_children(|parent| {
+                // Player tab button
+                parent.spawn(ButtonBundle {
+                    style: Style {
+                        width: Val::Percent(100.0),
+                        height: Val::Percent(100.0),
+                        justify_content: JustifyContent::Center,
+                        align_items: AlignItems::Center,
+                        border: UiRect::all(Val::Px(2.0)),
+                        ..default()
+                    },
+                    border_color: Color::hex("7F7F7FFF").unwrap().into(),
+                    background_color: Color::hex("#5a5a5aFF").unwrap().into(),
+                    ..default()
+                }).with_children(|parent| {
+                    parent.spawn(TextBundle::from_section(
+                        "Player",
+                        TextStyle {
+                            font: asset_server.load("fonts/Flexi_IBM_VGA_True.ttf"),
+                            font_size: 16.0,
+                            color: Color::rgb(0.9, 0.9, 0.9),
+                        },
+                    ));
+                });
+                // Network tab button
+                parent.spawn(ButtonBundle {
+                    style: Style {
+                        width: Val::Percent(100.0),
+                        height: Val::Percent(100.0),
+                        justify_content: JustifyContent::Center,
+                        align_items: AlignItems::Center,
+                        border: UiRect::all(Val::Px(2.0)),
+                        ..default()
+                    },
+                    border_color: Color::hex("7F7F7FFF").unwrap().into(),
+                    background_color: Color::hex("#5a5a5aFF").unwrap().into(),
+                    ..default()
+                }).with_children(|parent| {
+                    parent.spawn(TextBundle::from_section(
+                        "Network",
+                        TextStyle {
+                            font: asset_server.load("fonts/Flexi_IBM_VGA_True.ttf"),
+                            font_size: 16.0,
+                            color: Color::rgb(0.9, 0.9, 0.9),
+                        },
+                    ));
+                });
+                // Chunks tab button
+                parent.spawn(ButtonBundle {
+                    style: Style {
+                        width: Val::Percent(100.0),
+                        height: Val::Percent(100.0),
+                        justify_content: JustifyContent::Center,
+                        align_items: AlignItems::Center,
+                        border: UiRect::all(Val::Px(2.0)),
+                        ..default()
+                    },
+                    border_color: Color::hex("7F7F7FFF").unwrap().into(),
+                    background_color: Color::hex("#5a5a5aFF").unwrap().into(),
+                    ..default()
+                }).with_children(|parent| {
+                    parent.spawn(TextBundle::from_section(
+                        "Chunks",
+                        TextStyle {
+                            font: asset_server.load("fonts/Flexi_IBM_VGA_True.ttf"),
+                            font_size: 16.0,
+                            color: Color::rgb(0.9, 0.9, 0.9),
+                        },
+                    ));
+                });
+            });
+            // Player Tab
+            parent.spawn(NodeBundle {
+                style: Style {
+                    width: Val::Percent(100.0),
+                    height: Val::Percent(100.0),
+                    display: Display::Flex,
+                    ..default()
+                },
+                ..default()
+            }).with_children(|parent| {
+                parent.spawn(TextBundle::from_section(
+                    "Position:",
+                    TextStyle {
+                        font: asset_server.load("fonts/Flexi_IBM_VGA_True.ttf"),
+                        font_size: 16.0,
+                        color: Color::rgb(0.9, 0.9, 0.9),
+                    },
+                ));
+            });
+            // Network Tab
+            parent.spawn(NodeBundle {
+                style: Style {
+                    width: Val::Percent(100.0),
+                    height: Val::Percent(100.0),
+                    display: Display::None,
+                    ..default()
+                },
+                ..default()
+            }).with_children(|parent| {
+                parent.spawn(TextBundle::from_section(
+                    "Nodes:",
+                    TextStyle {
+                        font: asset_server.load("fonts/Flexi_IBM_VGA_True.ttf"),
+                        font_size: 16.0,
+                        color: Color::rgb(0.9, 0.9, 0.9),
+                    },
+                ));
+            });
+            // Chunks Tab
+            parent.spawn(NodeBundle {
+                style: Style {
+                    width: Val::Percent(100.0),
+                    height: Val::Percent(100.0),
+                    display: Display::None,
+                    ..default()
+                },
+                ..default()
+            }).with_children(|parent| {
+                parent.spawn(TextBundle::from_section(
+                    "Map:",
+                    TextStyle {
+                        font: asset_server.load("fonts/Flexi_IBM_VGA_True.ttf"),
+                        font_size: 16.0,
+                        color: Color::rgb(0.9, 0.9, 0.9),
+                    },
+                ));
             });
         });
     });
