@@ -52,6 +52,7 @@ fn setup(
 }
 
 fn ui(mut commands: Commands, asset_server: Res<AssetServer>) {
+    // screen
     commands.spawn(NodeBundle {
         style: Style {
             width: Val::Percent(100.0),
@@ -61,15 +62,88 @@ fn ui(mut commands: Commands, asset_server: Res<AssetServer>) {
         },
         ..default()
     }).with_children(|parent| {
+        // UI Box
         parent.spawn(NodeBundle {
             style: Style {
                 width: Val::Px(200.0),
                 border: UiRect::all(Val::Px(2.0)),
+                justify_content: JustifyContent::Start,
+                flex_direction: FlexDirection::Column,
                 ..default()
             },
             border_color: Color::hex("454545FF").unwrap().into(),
             background_color: Color::hex("303030EA").unwrap().into(),
             ..default()
+        }).with_children(|parent| {
+            // Load/Save buttons
+            parent.spawn(NodeBundle {
+                style: Style {
+                    width: Val::Percent(100.0),
+                    height: Val::Px(20.0),
+                    border: UiRect::bottom(Val::Px(2.0)),
+                    ..default()
+                },
+                border_color: Color::hex("454545FF").unwrap().into(),
+                ..default()
+            }).with_children(|parent| {
+                // Load button
+                parent.spawn(ButtonBundle {
+                    style: Style {
+                        width: Val::Percent(100.0),
+                        height: Val::Percent(100.0),
+                        justify_content: JustifyContent::Center,
+                        align_items: AlignItems::Center,
+                        border: UiRect::all(Val::Px(2.0)),
+                        ..default()
+                    },
+                    border_color: Color::hex("7F7F7FFF").unwrap().into(),
+                    background_color: Color::hex("#5a5a5aFF").unwrap().into(),
+                    ..default()
+                }).with_children(|parent| {
+                    parent.spawn(TextBundle::from_section(
+                        "Load",
+                        TextStyle {
+                            font: asset_server.load("fonts/Flexi_IBM_VGA_True.ttf"),
+                            font_size: 16.0,
+                            color: Color::rgb(0.9, 0.9, 0.9),
+                        },
+                    ));
+                });
+                // Save button
+                parent.spawn(ButtonBundle {
+                    style: Style {
+                        width: Val::Percent(100.0),
+                        height: Val::Percent(100.0),
+                        justify_content: JustifyContent::Center,
+                        align_items: AlignItems::Center,
+                        border: UiRect::all(Val::Px(2.0)),
+                        ..default()
+                    },
+                    border_color: Color::hex("7F7F7FFF").unwrap().into(),
+                    background_color: Color::hex("#5a5a5aFF").unwrap().into(),
+                    ..default()
+                }).with_children(|parent| {
+                    parent.spawn(TextBundle::from_section(
+                        "Save",
+                        TextStyle {
+                            font: asset_server.load("fonts/Flexi_IBM_VGA_True.ttf"),
+                            font_size: 16.0,
+                            color: Color::rgb(0.9, 0.9, 0.9),
+                        },
+                    ));
+                });
+            });
+            // Section Tabs
+            parent.spawn(NodeBundle {
+                style: Style {
+                    width: Val::Percent(100.0),
+                    height: Val::Px(20.0),
+                    border: UiRect::bottom(Val::Px(2.0)),
+                    ..default()
+                },
+                border_color: Color::hex("454545FF").unwrap().into(),
+                ..default()
+            });
         });
     });
 }
