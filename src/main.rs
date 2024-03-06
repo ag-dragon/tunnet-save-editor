@@ -6,6 +6,7 @@ use bevy::{
 fn main() {
     App::new()
         .add_plugins(DefaultPlugins)
+        .insert_resource(ClearColor(Color::rgb(0.1, 0.1, 0.1)))
         .insert_resource(WinitSettings::desktop_app())
         .add_systems(Startup, setup)
         .add_systems(Startup, ui)
@@ -19,7 +20,7 @@ fn setup(
 ) {
     // circular base
     commands.spawn(PbrBundle {
-        mesh: meshes.add(Circle::new(4.0)),
+        mesh: meshes.add(Circle::new(40.0)),
         material: materials.add(Color::WHITE),
         transform: Transform::from_rotation(Quat::from_rotation_x(-std::f32::consts::FRAC_PI_2)),
         ..default()
@@ -55,9 +56,20 @@ fn ui(mut commands: Commands, asset_server: Res<AssetServer>) {
         style: Style {
             width: Val::Percent(100.0),
             height: Val::Percent(100.0),
-            justify_content: JustifyContent::SpaceBetween,
+            justify_content: JustifyContent::Start,
             ..default()
         },
         ..default()
+    }).with_children(|parent| {
+        parent.spawn(NodeBundle {
+            style: Style {
+                width: Val::Px(200.0),
+                border: UiRect::all(Val::Px(2.0)),
+                ..default()
+            },
+            border_color: Color::hex("454545FF").unwrap().into(),
+            background_color: Color::hex("303030EA").unwrap().into(),
+            ..default()
+        });
     });
 }
