@@ -3,6 +3,13 @@ use bevy::{
     winit::WinitSettings,
 };
 
+#[derive(Component)]
+enum EditorTab {
+    Player,
+    Network,
+    Chunks,
+}
+
 fn main() {
     App::new()
         .add_plugins(DefaultPlugins)
@@ -10,6 +17,7 @@ fn main() {
         .insert_resource(WinitSettings::desktop_app())
         .add_systems(Startup, setup)
         .add_systems(Startup, ui)
+        .add_systems(Update, editor_tabs)
         .run();
 }
 
@@ -215,7 +223,7 @@ fn ui(mut commands: Commands, asset_server: Res<AssetServer>) {
                 });
             });
             // Player Tab
-            parent.spawn(NodeBundle {
+            parent.spawn((NodeBundle {
                 style: Style {
                     width: Val::Percent(100.0),
                     height: Val::Percent(100.0),
@@ -223,7 +231,8 @@ fn ui(mut commands: Commands, asset_server: Res<AssetServer>) {
                     ..default()
                 },
                 ..default()
-            }).with_children(|parent| {
+            },
+            EditorTab::Player)).with_children(|parent| {
                 parent.spawn(TextBundle::from_section(
                     "Position:",
                     TextStyle {
@@ -234,7 +243,7 @@ fn ui(mut commands: Commands, asset_server: Res<AssetServer>) {
                 ));
             });
             // Network Tab
-            parent.spawn(NodeBundle {
+            parent.spawn((NodeBundle {
                 style: Style {
                     width: Val::Percent(100.0),
                     height: Val::Percent(100.0),
@@ -242,7 +251,8 @@ fn ui(mut commands: Commands, asset_server: Res<AssetServer>) {
                     ..default()
                 },
                 ..default()
-            }).with_children(|parent| {
+            },
+            EditorTab::Network)).with_children(|parent| {
                 parent.spawn(TextBundle::from_section(
                     "Nodes:",
                     TextStyle {
@@ -253,7 +263,7 @@ fn ui(mut commands: Commands, asset_server: Res<AssetServer>) {
                 ));
             });
             // Chunks Tab
-            parent.spawn(NodeBundle {
+            parent.spawn((NodeBundle {
                 style: Style {
                     width: Val::Percent(100.0),
                     height: Val::Percent(100.0),
@@ -261,7 +271,8 @@ fn ui(mut commands: Commands, asset_server: Res<AssetServer>) {
                     ..default()
                 },
                 ..default()
-            }).with_children(|parent| {
+            },
+            EditorTab::Chunks)).with_children(|parent| {
                 parent.spawn(TextBundle::from_section(
                     "Map:",
                     TextStyle {
@@ -273,4 +284,30 @@ fn ui(mut commands: Commands, asset_server: Res<AssetServer>) {
             });
         });
     });
+}
+
+fn editor_tabs(
+    mut interaction_query: Query<
+        &Interaction,
+        (Changed<Interaction>, With<Button>),
+    >,
+    mut tab_query: Query<&mut Style, With<EditorTab>>,
+) {
+    for interaction in &mut interaction_query {
+        match *interaction {
+            Interaction::Pressed => {
+
+
+
+                println!("pressed");
+                for mut tab in &mut tab_query {
+                    tab.display = Display::Flex;
+                }
+            }
+            Interaction::Hovered => {
+            }
+            Interaction::None => {
+            }
+        }
+    }
 }
