@@ -4,6 +4,8 @@ use bevy::{
 };
 use bevy_egui::{egui, EguiContexts, EguiPlugin};
 use egui::{FontData, FontDefinitions, FontFamily};
+use serde::{Serialize, Deserialize};
+use std::{fs::File, io::BufReader};
 
 #[derive(Resource, Default)]
 enum EditorTab {
@@ -11,6 +13,17 @@ enum EditorTab {
     Player,
     Network,
     Chunks,
+}
+
+#[derive(Serialize, Deserialize, Debug)]
+struct Player {
+    pos: [f64; 3],
+    credits: i32,
+}
+
+#[derive(Resource, Serialize, Deserialize, Debug)]
+struct SaveFile {
+    player: Player,
 }
 
 fn main() {
@@ -21,6 +34,7 @@ fn main() {
         .insert_resource(WinitSettings::desktop_app())
         .init_resource::<EditorTab>()
         .add_systems(Startup, setup)
+        .add_systems(Startup, load_save)
         .add_systems(Startup, editor_ui_setup)
         .add_systems(Update, editor_ui)
         .run();
@@ -62,6 +76,13 @@ fn setup(
         transform: Transform::from_xyz(-2.5, 4.5, 9.0).looking_at(Vec3::ZERO, Vec3::Y),
         ..default()
     });
+}
+
+fn load_save() {
+    let file = File::open("test.json").unwrap();
+    let reader = BufReader::new(file);
+
+    let save_file: SaveFile = serde_json::from_reader(reader).unwrap();
 }
 
 fn editor_ui_setup(mut contexts: EguiContexts) {
@@ -118,6 +139,12 @@ fn editor_ui(mut contexts: EguiContexts, mut editor_tab: ResMut<EditorTab>) {
                 EditorTab::Player => {
                     ui.vertical_centered(|ui| {
                         ui.heading("Player");
+
+                        ui.horizontal(|ui| {
+                            ui.label("Player Position");
+                            let mut string: String = "".to_string();
+                            ui.text_edit_singleline(&mut string);
+                        });
                     });
                 },
                 EditorTab::Network => {
