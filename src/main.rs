@@ -23,6 +23,17 @@ struct Player {
 
 #[derive(Serialize, Deserialize, Default, Debug)]
 struct Story {
+    //state:: enum,
+    surface: bool,
+    companion: bool,
+    disinfected: i32,
+    disinfection_dialog: i32,
+    military_cleared: bool,
+    luxury_cleared: bool,
+    monastry_cleared: bool,
+    researchlab_cleared: bool,
+
+    shop_level: i32,
     digging: bool,
     relay: bool,
     hub: bool,
@@ -43,6 +54,17 @@ struct Story {
     tester_snoop: bool,
     scan_short_enhanced: bool,
     scan_long_peers: bool,
+
+    movement: bool,
+    look: bool,
+    sprint: bool,
+
+    // inventory: Inventory(Items?)
+    // knowledge: Knowledge(unread, journal[])
+
+    //connection_status: Vec
+    // streaks?
+    // mainframes: Vec?
 }
 
 #[derive(Resource, Serialize, Deserialize, Default, Debug)]
@@ -175,23 +197,35 @@ fn editor_ui(mut contexts: EguiContexts, mut editor_tab: ResMut<EditorTab>, mut 
                     ui.vertical_centered(|ui| {
                         ui.heading("Player");
 
-                        ui.horizontal(|ui| {
-                            ui.label("Credits:");
-                            ui.label(save_file.player.credits.to_string());
-                        });
 
-                        ui.collapsing("Player Position", |ui| {
+                        ui.collapsing("Player Data", |ui| {
+                            ui.collapsing("Player Position", |ui| {
+                                ui.horizontal(|ui| {
+                                    ui.label("x:");
+                                    ui.label(save_file.player.pos[0].to_string());
+                                    ui.label("y:");
+                                    ui.label(save_file.player.pos[1].to_string());
+                                    ui.label("z:");
+                                    ui.label(save_file.player.pos[2].to_string());
+                                });
+                            });
                             ui.horizontal(|ui| {
-                                ui.label("x:");
-                                ui.label(save_file.player.pos[0].to_string());
-                                ui.label("y:");
-                                ui.label(save_file.player.pos[1].to_string());
-                                ui.label("z:");
-                                ui.label(save_file.player.pos[2].to_string());
+                                ui.label("Credits:");
+                                ui.label(save_file.player.credits.to_string());
+                            });
+                            ui.horizontal(|ui| {
+                                let mut movement = save_file.story.movement;
+                                ui.checkbox(&mut movement, "Can Walk/Sprint");
+                                save_file.story.movement = movement;
+                            });
+                            ui.horizontal(|ui| {
+                                let mut look = save_file.story.look;
+                                ui.checkbox(&mut look, "Can Move Camera");
+                                save_file.story.look = look;
                             });
                         });
 
-                        ui.collapsing("Upgrades", |ui| {
+                        ui.collapsing("Shop Unlocks", |ui| {
                             ui.horizontal(|ui| {
                                 let mut drill = save_file.story.digging;
                                 ui.checkbox(&mut drill, "Drill");
@@ -221,6 +255,39 @@ fn editor_ui(mut contexts: EguiContexts, mut editor_tab: ResMut<EditorTab>, mut 
                                 let mut scan_long = save_file.story.scan_long;
                                 ui.checkbox(&mut scan_long, "Long-Range Radar");
                                 save_file.story.scan_long = scan_long;
+                            });
+                        });
+
+                        ui.collapsing("Story Progress", |ui| {
+                            ui.horizontal(|ui| {
+                                let mut researchlab_cleared = save_file.story.researchlab_cleared;
+                                ui.checkbox(&mut researchlab_cleared, "Research Lab Cleared");
+                                save_file.story.researchlab_cleared = researchlab_cleared;
+                            });
+                            ui.horizontal(|ui| {
+                                let mut military_cleared = save_file.story.military_cleared;
+                                ui.checkbox(&mut military_cleared, "Military Outpost Cleared");
+                                save_file.story.military_cleared = military_cleared;
+                            });
+                            ui.horizontal(|ui| {
+                                let mut monastry_cleared = save_file.story.monastry_cleared;
+                                ui.checkbox(&mut monastry_cleared, "Monastry Cleared");
+                                save_file.story.monastry_cleared = monastry_cleared;
+                            });
+                            ui.horizontal(|ui| {
+                                let mut luxury_cleared = save_file.story.luxury_cleared;
+                                ui.checkbox(&mut luxury_cleared, "Villa Cleared");
+                                save_file.story.luxury_cleared = luxury_cleared;
+                            });
+                            ui.horizontal(|ui| {
+                                let mut companion = save_file.story.companion;
+                                ui.checkbox(&mut companion, "Drone Companion");
+                                save_file.story.companion = companion;
+                            });
+                            ui.horizontal(|ui| {
+                                let mut surface = save_file.story.surface;
+                                ui.checkbox(&mut surface, "Surface unlocked");
+                                save_file.story.surface = surface;
                             });
                         });
                     });
