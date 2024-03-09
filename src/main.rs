@@ -5,7 +5,7 @@ use bevy::{
 use bevy_egui::{egui, EguiContexts, EguiPlugin};
 use egui::{FontData, FontDefinitions, FontFamily};
 use serde::{Serialize, Deserialize};
-use std::{fs::File, io::BufReader};
+use std::{fs::File, io::BufReader, io::Write};
 
 #[derive(Resource, Default)]
 enum EditorTab {
@@ -15,13 +15,13 @@ enum EditorTab {
     Chunks,
 }
 
-#[derive(Serialize, Deserialize, Debug)]
+#[derive(Serialize, Deserialize, Default, Debug)]
 struct Player {
     pos: [f64; 3],
     credits: i32,
 }
 
-#[derive(Resource, Serialize, Deserialize, Debug)]
+#[derive(Resource, Serialize, Deserialize, Default, Debug)]
 struct SaveFile {
     player: Player,
 }
@@ -33,8 +33,8 @@ fn main() {
         .insert_resource(ClearColor(Color::rgb(0.1, 0.1, 0.1)))
         .insert_resource(WinitSettings::desktop_app())
         .init_resource::<EditorTab>()
+        .init_resource::<SaveFile>()
         .add_systems(Startup, setup)
-        .add_systems(Startup, load_save)
         .add_systems(Startup, editor_ui_setup)
         .add_systems(Update, editor_ui)
         .run();
@@ -78,13 +78,6 @@ fn setup(
     });
 }
 
-fn load_save() {
-    let file = File::open("test.json").unwrap();
-    let reader = BufReader::new(file);
-
-    let save_file: SaveFile = serde_json::from_reader(reader).unwrap();
-}
-
 fn editor_ui_setup(mut contexts: EguiContexts) {
     let ctx = contexts.ctx_mut();
 
@@ -105,7 +98,7 @@ fn editor_ui_setup(mut contexts: EguiContexts) {
     // Change styling
 }
 
-fn editor_ui(mut contexts: EguiContexts, mut editor_tab: ResMut<EditorTab>) {
+fn editor_ui(mut contexts: EguiContexts, mut editor_tab: ResMut<EditorTab>, mut save_file: ResMut<SaveFile>) {
     let ctx = contexts.ctx_mut();
     egui::SidePanel::left("side_panel")
         .default_width(200.0)
@@ -114,10 +107,27 @@ fn editor_ui(mut contexts: EguiContexts, mut editor_tab: ResMut<EditorTab>) {
 
             ui.horizontal(|ui| {
                 if ui.button("Load").clicked() {
-                    print!("load");
+                    if let Some(path) = rfd::FileDialog::new()
+                            .add_filter("json", &["json"])
+                            .add_filter("*", &["*"])
+                            .set_directory("./example_saves")
+                            .pick_file() {
+                        let file = File::open(path.display().to_string()).unwrap();
+                        let reader = BufReader::new(file);
+
+                        *save_file = serde_json::from_reader(reader).unwrap();
+                    }
                 }
                 if ui.button("Save").clicked() {
-                    print!("save");
+                    if let Some(path) = rfd::FileDialog::new()
+                            .add_filter("json", &["json"])
+                            .add_filter("*", &["*"])
+                            .set_directory("./example_saves")
+                            .set_file_name("save.json")
+                            .save_file() {
+                        let mut file = File::create(path.display().to_string()).unwrap();
+                        file.write_all(serde_json::to_string(&*save_file).unwrap().as_bytes());
+                    }
                 }
             });
 
@@ -142,8 +152,11 @@ fn editor_ui(mut contexts: EguiContexts, mut editor_tab: ResMut<EditorTab>) {
 
                         ui.horizontal(|ui| {
                             ui.label("Player Position");
-                            let mut string: String = "".to_string();
-                            ui.text_edit_singleline(&mut string);
+
+                            ui.label(save_file.player.pos[0].to_string());
+
+                            //let mut string: String = "".to_string();
+                            //ui.text_edit_singleline(&mut string);
                         });
                     });
                 },
