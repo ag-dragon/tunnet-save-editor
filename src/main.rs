@@ -100,6 +100,8 @@ fn editor_ui(mut contexts: EguiContexts, mut editor_tab: ResMut<EditorTab>) {
                 }
             });
 
+            ui.separator();
+
             ui.horizontal(|ui| {
                 if ui.button("Player").clicked() {
                     *editor_tab = EditorTab::Player;
@@ -114,13 +116,19 @@ fn editor_ui(mut contexts: EguiContexts, mut editor_tab: ResMut<EditorTab>) {
 
             match *editor_tab {
                 EditorTab::Player => {
-                    ui.label("Player");
+                    ui.vertical_centered(|ui| {
+                        ui.heading("Player");
+                    });
                 },
                 EditorTab::Network => {
-                    ui.label("Network");
+                    ui.vertical_centered(|ui| {
+                        ui.heading("Network");
+                    });
                 },
                 EditorTab::Chunks => {
-                    ui.label("Chunks");
+                    ui.vertical_centered(|ui| {
+                        ui.heading("Chunks");
+                    });
                 },
             }
         });
