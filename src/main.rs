@@ -3,6 +3,7 @@ use bevy::{
     winit::WinitSettings,
 };
 use bevy_egui::{egui, EguiContexts, EguiPlugin};
+use egui::{FontData, FontDefinitions, FontFamily};
 
 #[derive(Component)]
 enum EditorTab {
@@ -18,6 +19,7 @@ fn main() {
         .insert_resource(ClearColor(Color::rgb(0.1, 0.1, 0.1)))
         .insert_resource(WinitSettings::desktop_app())
         .add_systems(Startup, setup)
+        .add_systems(Startup, editor_ui_setup)
         .add_systems(Update, editor_ui)
         .run();
 }
@@ -60,11 +62,28 @@ fn setup(
     });
 }
 
+fn editor_ui_setup(mut contexts: EguiContexts) {
+    let ctx = contexts.ctx_mut();
+
+    let mut fonts = FontDefinitions::default();
+
+    fonts.font_data.insert("Flexi_IBM_VGA_True".to_owned(),
+        FontData::from_static(include_bytes!("../assets/fonts/Flexi_IBM_VGA_True.ttf")));
+
+    fonts.families.get_mut(&FontFamily::Proportional).unwrap()
+        .insert(0, "Flexi_IBM_VGA_True".to_owned());
+
+    fonts.families.get_mut(&FontFamily::Monospace).unwrap()
+        .push("Flexi_IBM_VGA_True".to_owned());
+
+    ctx.set_fonts(fonts);
+}
+
 fn editor_ui(mut contexts: EguiContexts) {
     let ctx = contexts.ctx_mut();
     egui::SidePanel::left("side_panel")
         .default_width(200.0)
         .show(ctx, |ui| {
-            ui.heading("Side Panel");
+            ui.heading("Tunnet Save Editor");
         });
 }
