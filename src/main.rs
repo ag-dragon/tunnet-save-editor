@@ -5,8 +5,9 @@ use bevy::{
 use bevy_egui::{egui, EguiContexts, EguiPlugin};
 use egui::{FontData, FontDefinitions, FontFamily};
 
-#[derive(Resource)]
+#[derive(Resource, Default)]
 enum EditorTab {
+    #[default]
     Player,
     Network,
     Chunks,
@@ -18,7 +19,7 @@ fn main() {
         .add_plugins(EguiPlugin)
         .insert_resource(ClearColor(Color::rgb(0.1, 0.1, 0.1)))
         .insert_resource(WinitSettings::desktop_app())
-        .insert_resource(EditorTab::Player)
+        .init_resource::<EditorTab>()
         .add_systems(Startup, setup)
         .add_systems(Startup, editor_ui_setup)
         .add_systems(Update, editor_ui)
