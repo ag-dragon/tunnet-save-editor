@@ -24,8 +24,10 @@ struct Player {
 #[derive(Serialize, Deserialize, Default, Debug)]
 struct Story {
     //state:: enum,
-    surface: bool,
+    //boss_phase
     companion: bool,
+    surface: bool,
+    review: bool,
     disinfected: i32,
     disinfection_dialog: i32,
     military_cleared: bool,
@@ -46,7 +48,7 @@ struct Story {
     antenna: bool,
     tester: bool,
     relay_light: bool,
-    patch: bool,
+    patch: bool, //?
     filter_collision: bool,
     filter_full_address: bool,
     tester_repeat: bool,
@@ -54,13 +56,20 @@ struct Story {
     tester_snoop: bool,
     scan_short_enhanced: bool,
     scan_long_peers: bool,
+    auto_map: bool,
 
     movement: bool,
     look: bool,
     sprint: bool,
 
+    page_no: i32,
+    pages: i32,
+
     // inventory: Inventory(Items?)
     // knowledge: Knowledge(unread, journal[])
+    // home
+    // visited_chunks Vec<coords>
+    // map_annotations
 
     //connection_status: Vec
     // streaks?
@@ -232,9 +241,19 @@ fn editor_ui(mut contexts: EguiContexts, mut editor_tab: ResMut<EditorTab>, mut 
                                 save_file.story.digging = drill;
                             });
                             ui.horizontal(|ui| {
+                                let mut patch = save_file.story.patch;
+                                ui.checkbox(&mut patch, "Drill Patching");
+                                save_file.story.patch = patch;
+                            });
+                            ui.horizontal(|ui| {
                                 let mut relay = save_file.story.relay;
                                 ui.checkbox(&mut relay, "Relay");
                                 save_file.story.relay = relay;
+                            });
+                            ui.horizontal(|ui| {
+                                let mut relay_light = save_file.story.relay_light;
+                                ui.checkbox(&mut relay_light, "Relay Light");
+                                save_file.story.relay_light = relay_light;
                             });
                             ui.horizontal(|ui| {
                                 let mut hub = save_file.story.hub;
@@ -247,14 +266,69 @@ fn editor_ui(mut contexts: EguiContexts, mut editor_tab: ResMut<EditorTab>, mut 
                                 save_file.story.filter = filter;
                             });
                             ui.horizontal(|ui| {
+                                let mut filter_collision = save_file.story.filter_collision;
+                                ui.checkbox(&mut filter_collision, "Filter Collision Handling");
+                                save_file.story.filter_collision = filter_collision;
+                            });
+                            ui.horizontal(|ui| {
+                                let mut filter_full_address = save_file.story.filter_full_address;
+                                ui.checkbox(&mut filter_full_address, "Filter Full Address");
+                                save_file.story.filter_full_address = filter_full_address;
+                            });
+                            ui.horizontal(|ui| {
                                 let mut scan_short = save_file.story.scan_short;
                                 ui.checkbox(&mut scan_short, "Short-Range Rader");
                                 save_file.story.scan_short = scan_short;
                             });
                             ui.horizontal(|ui| {
+                                let mut scan_short_enhanced = save_file.story.scan_short_enhanced;
+                                ui.checkbox(&mut scan_short_enhanced, "Short-Range Rader Enhanced");
+                                save_file.story.scan_short_enhanced = scan_short_enhanced;
+                            });
+                            ui.horizontal(|ui| {
                                 let mut scan_long = save_file.story.scan_long;
                                 ui.checkbox(&mut scan_long, "Long-Range Radar");
                                 save_file.story.scan_long = scan_long;
+                            });
+                            ui.horizontal(|ui| {
+                                let mut scan_long_peers = save_file.story.scan_long_peers;
+                                ui.checkbox(&mut scan_long_peers, "Long-Range Radar Peers");
+                                save_file.story.scan_long_peers = scan_long_peers;
+                            });
+                            ui.horizontal(|ui| {
+                                let mut antivirus = save_file.story.antivirus;
+                                ui.checkbox(&mut antivirus, "Antivirus");
+                                save_file.story.antivirus = antivirus;
+                            });
+                            ui.horizontal(|ui| {
+                                let mut tester = save_file.story.tester;
+                                ui.checkbox(&mut tester, "Tester");
+                                save_file.story.tester = tester;
+                            });
+                            ui.horizontal(|ui| {
+                                let mut tester_repeat = save_file.story.tester_repeat;
+                                ui.checkbox(&mut tester_repeat, "Tester Repeat");
+                                save_file.story.tester_repeat = tester_repeat;
+                            });
+                            ui.horizontal(|ui| {
+                                let mut tester_spoof = save_file.story.tester_spoof;
+                                ui.checkbox(&mut tester_spoof, "Tester Spoof");
+                                save_file.story.tester_spoof = tester_spoof;
+                            });
+                            ui.horizontal(|ui| {
+                                let mut tester_snoop = save_file.story.tester_snoop;
+                                ui.checkbox(&mut tester_snoop, "Tester Snoop");
+                                save_file.story.tester_snoop = tester_snoop;
+                            });
+                            ui.horizontal(|ui| {
+                                let mut jetpack = save_file.story.jetpack;
+                                ui.checkbox(&mut jetpack, "Jetpack");
+                                save_file.story.jetpack = jetpack;
+                            });
+                            ui.horizontal(|ui| {
+                                let mut auto_map = save_file.story.auto_map;
+                                ui.checkbox(&mut auto_map, "Auto-Map");
+                                save_file.story.auto_map = auto_map;
                             });
                         });
 
@@ -289,6 +363,16 @@ fn editor_ui(mut contexts: EguiContexts, mut editor_tab: ResMut<EditorTab>, mut 
                                 ui.checkbox(&mut surface, "Surface unlocked");
                                 save_file.story.surface = surface;
                             });
+                            ui.horizontal(|ui| {
+                                let mut review = save_file.story.review;
+                                ui.checkbox(&mut review, "End Review Available");
+                                save_file.story.review = review;
+                            });
+                        });
+
+                        ui.collapsing("Guidebook", |ui| {
+                            // page_no
+                            // pages
                         });
                     });
                 },
