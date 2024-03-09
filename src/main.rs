@@ -5,7 +5,7 @@ use bevy::{
 use bevy_egui::{egui, EguiContexts, EguiPlugin};
 use egui::{FontData, FontDefinitions, FontFamily};
 
-#[derive(Component)]
+#[derive(Resource)]
 enum EditorTab {
     Player,
     Network,
@@ -18,6 +18,7 @@ fn main() {
         .add_plugins(EguiPlugin)
         .insert_resource(ClearColor(Color::rgb(0.1, 0.1, 0.1)))
         .insert_resource(WinitSettings::desktop_app())
+        .insert_resource(EditorTab::Player)
         .add_systems(Startup, setup)
         .add_systems(Startup, editor_ui_setup)
         .add_systems(Update, editor_ui)
@@ -65,6 +66,7 @@ fn setup(
 fn editor_ui_setup(mut contexts: EguiContexts) {
     let ctx = contexts.ctx_mut();
 
+    // Change font to tunnet font
     let mut fonts = FontDefinitions::default();
 
     fonts.font_data.insert("Flexi_IBM_VGA_True".to_owned(),
@@ -77,9 +79,11 @@ fn editor_ui_setup(mut contexts: EguiContexts) {
         .push("Flexi_IBM_VGA_True".to_owned());
 
     ctx.set_fonts(fonts);
+
+    // Change styling
 }
 
-fn editor_ui(mut contexts: EguiContexts) {
+fn editor_ui(mut contexts: EguiContexts, mut editor_tab: ResMut<EditorTab>) {
     let ctx = contexts.ctx_mut();
     egui::SidePanel::left("side_panel")
         .default_width(200.0)
