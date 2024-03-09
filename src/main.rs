@@ -21,9 +21,34 @@ struct Player {
     credits: i32,
 }
 
+#[derive(Serialize, Deserialize, Default, Debug)]
+struct Story {
+    digging: bool,
+    relay: bool,
+    hub: bool,
+    filter: bool,
+    scan_short: bool,
+    scan_long: bool,
+    jetpack: bool,
+    antivirus: bool,
+    optical_fiber: bool,
+    antenna: bool,
+    tester: bool,
+    relay_light: bool,
+    patch: bool,
+    filter_collision: bool,
+    filter_full_address: bool,
+    tester_repeat: bool,
+    tester_spoof: bool,
+    tester_snoop: bool,
+    scan_short_enhanced: bool,
+    scan_long_peers: bool,
+}
+
 #[derive(Resource, Serialize, Deserialize, Default, Debug)]
 struct SaveFile {
     player: Player,
+    story: Story,
 }
 
 fn main() {
@@ -126,7 +151,7 @@ fn editor_ui(mut contexts: EguiContexts, mut editor_tab: ResMut<EditorTab>, mut 
                             .set_file_name("save.json")
                             .save_file() {
                         let mut file = File::create(path.display().to_string()).unwrap();
-                        file.write_all(serde_json::to_string(&*save_file).unwrap().as_bytes());
+                        file.write_all(serde_json::to_string(&*save_file).unwrap().as_bytes()).unwrap();
                     }
                 }
             });
@@ -151,12 +176,52 @@ fn editor_ui(mut contexts: EguiContexts, mut editor_tab: ResMut<EditorTab>, mut 
                         ui.heading("Player");
 
                         ui.horizontal(|ui| {
-                            ui.label("Player Position");
+                            ui.label("Credits:");
+                            ui.label(save_file.player.credits.to_string());
+                        });
 
-                            ui.label(save_file.player.pos[0].to_string());
+                        ui.collapsing("Player Position", |ui| {
+                            ui.horizontal(|ui| {
+                                ui.label("x:");
+                                ui.label(save_file.player.pos[0].to_string());
+                                ui.label("y:");
+                                ui.label(save_file.player.pos[1].to_string());
+                                ui.label("z:");
+                                ui.label(save_file.player.pos[2].to_string());
+                            });
+                        });
 
-                            //let mut string: String = "".to_string();
-                            //ui.text_edit_singleline(&mut string);
+                        ui.collapsing("Upgrades", |ui| {
+                            ui.horizontal(|ui| {
+                                let mut drill = save_file.story.digging;
+                                ui.checkbox(&mut drill, "Drill");
+                                save_file.story.digging = drill;
+                            });
+                            ui.horizontal(|ui| {
+                                let mut relay = save_file.story.relay;
+                                ui.checkbox(&mut relay, "Relay");
+                                save_file.story.relay = relay;
+                            });
+                            ui.horizontal(|ui| {
+                                let mut hub = save_file.story.hub;
+                                ui.checkbox(&mut hub, "Hub");
+                                save_file.story.hub = hub;
+                            });
+                            ui.horizontal(|ui| {
+                                let mut filter = save_file.story.filter;
+                                ui.checkbox(&mut filter, "Filter");
+                                save_file.story.filter = filter;
+                            });
+                            ui.horizontal(|ui| {
+                                let mut scan_short = save_file.story.scan_short;
+                                ui.checkbox(&mut scan_short, "Short-Range Rader");
+                                save_file.story.scan_short = scan_short;
+                            });
+                            ui.horizontal(|ui| {
+                                let mut scan_long = save_file.story.scan_long;
+                                ui.checkbox(&mut scan_long, "Long-Range Radar");
+                                save_file.story.scan_long = scan_long;
+                            });
                         });
                     });
                 },
