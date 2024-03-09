@@ -89,5 +89,38 @@ fn editor_ui(mut contexts: EguiContexts, mut editor_tab: ResMut<EditorTab>) {
         .default_width(200.0)
         .show(ctx, |ui| {
             ui.heading("Tunnet Save Editor");
+
+            ui.horizontal(|ui| {
+                if ui.button("Load").clicked() {
+                    print!("load");
+                }
+                if ui.button("Save").clicked() {
+                    print!("save");
+                }
+            });
+
+            ui.horizontal(|ui| {
+                if ui.button("Player").clicked() {
+                    *editor_tab = EditorTab::Player;
+                }
+                if ui.button("Network").clicked() {
+                    *editor_tab = EditorTab::Network;
+                }
+                if ui.button("Chunks").clicked() {
+                    *editor_tab = EditorTab::Chunks;
+                }
+            });
+
+            match *editor_tab {
+                EditorTab::Player => {
+                    ui.label("Player");
+                },
+                EditorTab::Network => {
+                    ui.label("Network");
+                },
+                EditorTab::Chunks => {
+                    ui.label("Chunks");
+                },
+            }
         });
 }
