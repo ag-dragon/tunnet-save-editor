@@ -66,10 +66,47 @@ impl StoryState {
     }
 }
 
+#[derive(Serialize, Deserialize, PartialEq, Clone, Copy, Default, Debug)]
+enum BossPhase {
+    #[default]
+    InfectMainframeWithAB,
+    InfectMainframeWithABCD,
+    KillswitchOne,
+    KillswitchTwo,
+    KillswitchThree,
+    KillswitchFour,
+    DisinfectEndpointOne,
+    DisinfectEndpointTwo,
+    DisinfectEndpointThree,
+    DisinfectEndpointFour,
+    DisinfectMainframe,
+    Destroyed,
+}
+
+impl BossPhase {
+    pub fn iterator() -> impl Iterator<Item = BossPhase> {
+        use BossPhase::*;
+        [
+            InfectMainframeWithAB,
+            InfectMainframeWithABCD,
+            KillswitchOne,
+            KillswitchTwo,
+            KillswitchThree,
+            KillswitchFour,
+            DisinfectEndpointOne,
+            DisinfectEndpointTwo,
+            DisinfectEndpointThree,
+            DisinfectEndpointFour,
+            DisinfectMainframe,
+            Destroyed,
+        ].iter().copied()
+    }
+}
+
 #[derive(Serialize, Deserialize, Default, Debug)]
 struct Story {
     state: StoryState,
-    //boss_phase
+    boss_phase: BossPhase,
     companion: bool,
     surface: bool,
     review: bool,
@@ -383,15 +420,24 @@ fn editor_ui(mut contexts: EguiContexts, mut editor_tab: ResMut<EditorTab>, mut 
                         });
 
                         ui.collapsing("Story Progress", |ui| {
-                            let mut selected = save_file.story.state;
+                            let mut story_selected = save_file.story.state;
                             egui::ComboBox::from_label("Story State")
-                                    .selected_text(format!("{:?}", selected))
+                                    .selected_text(format!("{:?}", story_selected))
                                     .show_ui(ui, |ui| {
                                 for story_state in StoryState::iterator() {
-                                    ui.selectable_value(&mut selected, story_state, format!("{:?}", story_state));
+                                    ui.selectable_value(&mut story_selected, story_state, format!("{:?}", story_state));
                                 }
                             });
-                            save_file.story.state = selected;
+                            save_file.story.state = story_selected;
+                            let mut boss_selected = save_file.story.boss_phase;
+                            egui::ComboBox::from_label("Boss State")
+                                    .selected_text(format!("{:?}", boss_selected))
+                                    .show_ui(ui, |ui| {
+                                for boss_state in BossPhase::iterator() {
+                                    ui.selectable_value(&mut boss_selected, boss_state, format!("{:?}", boss_state));
+                                }
+                            });
+                            save_file.story.boss_phase = boss_selected;
                             ui.horizontal(|ui| {
                                 let mut researchlab_cleared = save_file.story.researchlab_cleared;
                                 ui.checkbox(&mut researchlab_cleared, "Research Lab Cleared");
