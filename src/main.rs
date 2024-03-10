@@ -21,9 +21,54 @@ struct Player {
     credits: i32,
 }
 
+#[derive(Serialize, Deserialize, PartialEq, Clone, Copy, Default, Debug)]
+enum StoryState {
+    BootUp,
+    Setup,
+    PressButton,
+    ConnectRelayToMainframe,
+    ConnectEndpointToMainframe,
+    UseHub,
+    UseScan,
+    ConnectToShelters,
+    TalkToScientist,
+    DisinfectMainframe,
+    DisinfectOtherMainframes,
+    DestroyCorruptedMainframe,
+    GoToSurface,
+    #[default]
+    TheEnd,
+    Review,
+    DemoEnd,
+}
+
+impl StoryState {
+    pub fn iterator() -> impl Iterator<Item = StoryState> {
+        use StoryState::*;
+        [
+            BootUp,
+            Setup,
+            PressButton,
+            ConnectRelayToMainframe,
+            ConnectEndpointToMainframe,
+            UseHub,
+            UseScan,
+            ConnectToShelters,
+            TalkToScientist,
+            DisinfectMainframe,
+            DisinfectOtherMainframes,
+            DestroyCorruptedMainframe,
+            GoToSurface,
+            TheEnd,
+            Review,
+            DemoEnd,
+        ].iter().copied()
+    }
+}
+
 #[derive(Serialize, Deserialize, Default, Debug)]
 struct Story {
-    //state:: enum,
+    state: StoryState,
     //boss_phase
     companion: bool,
     surface: bool,
@@ -338,6 +383,15 @@ fn editor_ui(mut contexts: EguiContexts, mut editor_tab: ResMut<EditorTab>, mut 
                         });
 
                         ui.collapsing("Story Progress", |ui| {
+                            let mut selected = save_file.story.state;
+                            egui::ComboBox::from_label("Story State")
+                                    .selected_text(format!("{:?}", selected))
+                                    .show_ui(ui, |ui| {
+                                for story_state in StoryState::iterator() {
+                                    ui.selectable_value(&mut selected, story_state, format!("{:?}", story_state));
+                                }
+                            });
+                            save_file.story.state = selected;
                             ui.horizontal(|ui| {
                                 let mut researchlab_cleared = save_file.story.researchlab_cleared;
                                 ui.checkbox(&mut researchlab_cleared, "Research Lab Cleared");
