@@ -210,17 +210,22 @@ fn editor_ui(mut contexts: EguiContexts, mut editor_tab: ResMut<EditorTab>, mut 
                         ui.collapsing("Player Data", |ui| {
                             ui.collapsing("Player Position", |ui| {
                                 ui.horizontal(|ui| {
-                                    ui.label("x:");
-                                    ui.label(save_file.player.pos[0].to_string());
-                                    ui.label("y:");
-                                    ui.label(save_file.player.pos[1].to_string());
-                                    ui.label("z:");
-                                    ui.label(save_file.player.pos[2].to_string());
+                                    let mut px = save_file.player.pos[0];
+                                    ui.add(egui::DragValue::new(&mut px).speed(0.1).prefix("x: "));
+                                    save_file.player.pos[0] = px;
+                                    let mut py = save_file.player.pos[1];
+                                    ui.add(egui::DragValue::new(&mut py).speed(0.1).prefix("y: "));
+                                    save_file.player.pos[1] = py;
+                                    let mut pz = save_file.player.pos[2];
+                                    ui.add(egui::DragValue::new(&mut pz).speed(0.1).prefix("z: "));
+                                    save_file.player.pos[2] = pz;
                                 });
                             });
                             ui.horizontal(|ui| {
                                 ui.label("Credits:");
-                                ui.label(save_file.player.credits.to_string());
+                                let mut credits = save_file.player.credits;
+                                ui.add(egui::DragValue::new(&mut credits).speed(0.1));
+                                save_file.player.credits = credits;
                             });
                             ui.horizontal(|ui| {
                                 let mut movement = save_file.story.movement;
