@@ -111,6 +111,27 @@ struct ChunkCoords {
 }
 
 #[derive(Serialize, Deserialize, Default, Debug)]
+struct MapAnnotations {
+    annotations: Vec<[Annotation; 2]>,
+}
+
+#[derive(Serialize, Deserialize, Default, Debug)]
+enum MapColor {
+    #[default]
+    Pink,
+    Yellow,
+    Green,
+    Blue,
+}
+
+#[derive(Serialize, Deserialize, Debug)]
+#[serde(untagged)]
+enum Annotation {
+    Coords(ChunkCoords),
+    Description { color: MapColor, note: String },
+}
+
+#[derive(Serialize, Deserialize, Default, Debug)]
 struct Story {
     state: StoryState,
     boss_phase: BossPhase,
@@ -158,7 +179,7 @@ struct Story {
     // knowledge: Knowledge(unread, journal[])
     // home
     visited_chunks: Vec<ChunkCoords>,
-    // map_annotations
+    map_annotations: MapAnnotations,
 
     //connection_status: Vec
     // streaks?
@@ -261,6 +282,7 @@ fn editor_ui(mut contexts: EguiContexts, mut editor_tab: ResMut<EditorTab>, mut 
                         let reader = BufReader::new(file);
 
                         *save_file = serde_json::from_reader(reader).unwrap();
+                        println!("{:?}", save_file.story.map_annotations);
                     }
                 }
                 if ui.button("Save").clicked() {
