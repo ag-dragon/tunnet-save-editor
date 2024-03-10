@@ -104,6 +104,13 @@ impl BossPhase {
 }
 
 #[derive(Serialize, Deserialize, Default, Debug)]
+struct ChunkCoords {
+    x: i32,
+    y: i32,
+    z: i32,
+}
+
+#[derive(Serialize, Deserialize, Default, Debug)]
 struct Story {
     state: StoryState,
     boss_phase: BossPhase,
@@ -150,7 +157,7 @@ struct Story {
     // inventory: Inventory(Items?)
     // knowledge: Knowledge(unread, journal[])
     // home
-    // visited_chunks Vec<coords>
+    visited_chunks: Vec<ChunkCoords>,
     // map_annotations
 
     //connection_status: Vec
