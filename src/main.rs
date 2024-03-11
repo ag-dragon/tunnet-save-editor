@@ -7,6 +7,8 @@ use egui::{FontData, FontDefinitions, FontFamily};
 use serde::{Serialize, Deserialize};
 use std::{fs::File, io::BufReader, io::Write, collections::HashMap};
 
+pub mod player;
+
 #[derive(Resource, Default)]
 enum EditorTab {
     #[default]
@@ -131,43 +133,6 @@ enum MapColor {
 enum Annotation {
     Coords(ChunkCoords),
     Description { color: MapColor, note: String },
-}
-
-#[derive(Serialize, Deserialize, Default, Debug)]
-struct Inventory {
-    items: HashMap<String, i32>,
-}
-
-#[derive(Clone, Copy, Debug)]
-enum InventoryItem {
-    Battery,
-    Scrap,
-    Toy,
-    Screw,
-    Disk,
-    Corn,
-    Speaker,
-    Seeds,
-    Magnet,
-    Oil,
-}
-
-impl InventoryItem {
-    pub fn iterator() -> impl Iterator<Item = InventoryItem> {
-        use InventoryItem::*;
-        [
-            Battery,
-            Scrap,
-            Toy,
-            Screw,
-            Disk,
-            Corn,
-            Speaker,
-            Seeds,
-            Magnet,
-            Oil,
-        ].iter().copied()
-    }
 }
 
 #[derive(Serialize, Deserialize, Default, Debug)]
@@ -497,7 +462,7 @@ struct Story {
     page_no: i32,
     pages: i32,
 
-    inventory: Inventory,
+    inventory: player::inventory::Inventory,
     knowledge: Knowledge,
     home: Home,
     visited_chunks: Vec<ChunkCoords>,
@@ -834,7 +799,7 @@ fn editor_ui(mut contexts: EguiContexts, mut editor_tab: ResMut<EditorTab>, mut 
                             });
 
                             ui.collapsing("Inventory", |ui| {
-                                for item in InventoryItem::iterator() {
+                                for item in player::inventory::InventoryItem::iterator() {
                                     let mut item_count: i32 = 0;
                                     match save_file.story.inventory.items.get(&format!("{:?}", item).to_lowercase()) {
                                         Some(count) => {
