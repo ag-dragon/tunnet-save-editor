@@ -9,7 +9,7 @@ pub struct Home {
     pub ads: Vec<Ad>,
 }
 
-#[derive(Serialize, Deserialize, PartialEq, Clone, Copy, Debug)]
+#[derive(EnumIter, Serialize, Deserialize, PartialEq, Clone, Copy, Debug)]
 pub enum Furniture {
     PalmTree,
     RoundTree,
@@ -65,4 +65,22 @@ pub struct Ad {
     pub seller: crate::Address,
     pub qty: i32,
     pub item: String,
+}
+
+pub fn home_editor(ui: &mut egui::Ui, save_file: &mut crate::SaveFile) {
+    ui.collapsing("Home", |ui| {
+        ui.collapsing("Items", |ui| {
+            for item in Furniture::iter() {
+                ui.horizontal(|ui| {
+                    let mut furniture = save_file.story.home.items.contains(&item);
+                    ui.checkbox(&mut furniture, format!("{:?}", item));
+                    if !furniture && save_file.story.home.items.contains(&item) {
+                        save_file.story.home.items.retain(|&x| x != item);
+                    } else if furniture && !save_file.story.home.items.contains(&item) {
+                        save_file.story.home.items.push(item);
+                    }
+                });
+            }
+        });
+    });
 }
