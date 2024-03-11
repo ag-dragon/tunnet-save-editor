@@ -5,6 +5,8 @@ use bevy::{
 use bevy_egui::{egui, EguiContexts, EguiPlugin};
 use egui::{FontData, FontDefinitions, FontFamily};
 use serde::{Serialize, Deserialize};
+use strum::IntoEnumIterator;
+use strum_macros::EnumIter;
 use std::{fs::File, io::BufReader, io::Write, collections::HashMap};
 
 pub mod player;
@@ -23,7 +25,7 @@ struct Player {
     credits: i32,
 }
 
-#[derive(Serialize, Deserialize, PartialEq, Clone, Copy, Default, Debug)]
+#[derive(EnumIter, Serialize, Deserialize, PartialEq, Clone, Copy, Default, Debug)]
 enum StoryState {
     BootUp,
     Setup,
@@ -45,32 +47,7 @@ enum StoryState {
     DemoEnd,
 }
 
-impl StoryState {
-    pub fn iterator() -> impl Iterator<Item = StoryState> {
-        use StoryState::*;
-        [
-            BootUp,
-            Setup,
-            PressButton,
-            ConnectRelayToMainframe,
-            ConnectEndpointToMainframe,
-            UseHub,
-            UseScan,
-            ConnectToShelters,
-            TalkToScientist,
-            DisinfectMainframe,
-            DisinfectOtherMainframes,
-            FindAbandonedLab,
-            DestroyCorruptedMainframe,
-            GoToSurface,
-            TheEnd,
-            Review,
-            DemoEnd,
-        ].iter().copied()
-    }
-}
-
-#[derive(Serialize, Deserialize, PartialEq, Clone, Copy, Default, Debug)]
+#[derive(EnumIter, Serialize, Deserialize, PartialEq, Clone, Copy, Default, Debug)]
 enum BossPhase {
     #[default]
     InfectMainframeWithAB,
@@ -85,26 +62,6 @@ enum BossPhase {
     DisinfectEndpointFour,
     DisinfectMainframe,
     Destroyed,
-}
-
-impl BossPhase {
-    pub fn iterator() -> impl Iterator<Item = BossPhase> {
-        use BossPhase::*;
-        [
-            InfectMainframeWithAB,
-            InfectMainframeWithABCD,
-            KillswitchOne,
-            KillswitchTwo,
-            KillswitchThree,
-            KillswitchFour,
-            DisinfectEndpointOne,
-            DisinfectEndpointTwo,
-            DisinfectEndpointThree,
-            DisinfectEndpointFour,
-            DisinfectMainframe,
-            Destroyed,
-        ].iter().copied()
-    }
 }
 
 #[derive(Serialize, Deserialize, Default, Debug)]
@@ -141,7 +98,7 @@ struct Knowledge {
     journal: Vec<JournalEntry>,
 }
 
-#[derive(Serialize, Deserialize, PartialEq, Clone, Copy, Debug)]
+#[derive(EnumIter, Serialize, Deserialize, PartialEq, Clone, Copy, Debug)]
 enum JournalEntry {
     Journal,
     LongHibernation,
@@ -233,104 +190,6 @@ enum JournalEntry {
     ShelterNetworkUsage,
     BossCanDisinfect,
     Retire,
-}
-
-impl JournalEntry {
-    pub fn iterator() -> impl Iterator<Item = JournalEntry> {
-        use JournalEntry::*;
-        [
-            Journal,
-            LongHibernation,
-            JobDescription,
-            RelayAvailable,
-            HubAvailable,
-            Filter,
-            FilterAvailable,
-            Antivirus,
-            AntivirusAvailable,
-            Combo,
-            ConnectionStatus,
-            CannotReachSurface,
-            RobotsHaveAFearModule,
-            RobotsCannotSurviveAtTheSurface,
-            OtherMainframesArePresent,
-            Antenna,
-            LongRangeScanner,
-            Tester,
-            OwnCabin,
-            SupervisorWokeTechnicianUp,
-            SupervisorWasHiredByTheArchitects,
-            SupervisorName,
-            SupervisorDoesNotRespond,
-            SupervisorNeedToFind,
-            SupervisorNeedsHelp,
-            SupervisorRadio,
-            SupervisorExploresDNASequence,
-            ArchitectsExist,
-            ArchitectsCreatedTheBunkers,
-            ArchitectsCreatedTheRobots,
-            ArchitectsDisappeared,
-            ArchitectsDidNotFinish,
-            ArchitectsFoundLifeForm,
-            MadelineTrappedTheArchitects,
-            ArchitectsDiedInHQ,
-            Apocalypse,
-            ApocalypseDidNotHappen,
-            Infection,
-            InfectionEffects,
-            Stalker,
-            Drone,
-            DroneShowsDirection,
-            DroneNeedsHelp,
-            CookSellsBatteries,
-            FishermanSellsScrap,
-            FishermanHasAMagnet,
-            FishermanLentMeHisMagnet,
-            FarmerTradesVegetablesForSeeds,
-            HermitLooksForADisk,
-            HermitTradesOilForVegetables,
-            GrandmaTradesToysForOil,
-            GrandmaNetworkUsage,
-            GrandpaNeedsABattery,
-            GrandpaHasANewBattery,
-            GrandpaWantsToHelpGrandson,
-            KidWantsAToy,
-            SoldiersGotTheMagnets,
-            SoldiersNeedOil,
-            OperatorNeedsAScrew,
-            OperatorTradesSpeakersForMagnets,
-            OperatorCanWork,
-            GrandsonJoinedTheScout,
-            ScoutTradesSeedsForScraps,
-            DJTradesDisksForSpeakers,
-            CashierBuysAnything,
-            SpidersDoNotLikeLight,
-            MonksShouldNotBeLookedAt,
-            SirensShouldBeLookedAt,
-            AbandonedLabQuiet,
-            UndergroundComplex,
-            ScoutsAreHiring,
-            GrandsonAgreedToJoin,
-            GrandsonExists,
-            VIPCodePhrase,
-            VIPCode,
-            NetworkUsageScientist,
-            MadelineIsMad,
-            MadelineHasAnIdea,
-            MadelineTookBattery,
-            MadelineNeedsBattery,
-            TechnicanNameDefault,
-            TechnicianNameHarry,
-            TechnicianNameRoger,
-            TechnicianNameTherese,
-            TechnicianNameChantal,
-            DJNetworkUsage,
-            DJHasASpeaker,
-            ShelterNetworkUsage,
-            BossCanDisinfect,
-            Retire,
-        ].iter().copied()
-    }
 }
 
 #[derive(Serialize, Deserialize, Default, Debug)]
@@ -747,7 +606,7 @@ fn editor_ui(mut contexts: EguiContexts, mut editor_tab: ResMut<EditorTab>, mut 
                                 egui::ComboBox::from_label("Story State")
                                         .selected_text(format!("{:?}", story_selected))
                                         .show_ui(ui, |ui| {
-                                    for story_state in StoryState::iterator() {
+                                    for story_state in StoryState::iter() {
                                         ui.selectable_value(&mut story_selected, story_state, format!("{:?}", story_state));
                                     }
                                 });
@@ -756,7 +615,7 @@ fn editor_ui(mut contexts: EguiContexts, mut editor_tab: ResMut<EditorTab>, mut 
                                 egui::ComboBox::from_label("Boss State")
                                         .selected_text(format!("{:?}", boss_selected))
                                         .show_ui(ui, |ui| {
-                                    for boss_state in BossPhase::iterator() {
+                                    for boss_state in BossPhase::iter() {
                                         ui.selectable_value(&mut boss_selected, boss_state, format!("{:?}", boss_state));
                                     }
                                 });
@@ -799,7 +658,7 @@ fn editor_ui(mut contexts: EguiContexts, mut editor_tab: ResMut<EditorTab>, mut 
                             });
 
                             ui.collapsing("Inventory", |ui| {
-                                for item in player::inventory::InventoryItem::iterator() {
+                                for item in player::inventory::InventoryItem::iter() {
                                     let mut item_count: i32 = 0;
                                     match save_file.story.inventory.items.get(&format!("{:?}", item).to_lowercase()) {
                                         Some(count) => {
@@ -826,7 +685,7 @@ fn editor_ui(mut contexts: EguiContexts, mut editor_tab: ResMut<EditorTab>, mut 
                                     save_file.story.knowledge.unread = unread;
                                 });
                                 ui.collapsing("Entries", |ui| {
-                                    for entry in JournalEntry::iterator() {
+                                    for entry in JournalEntry::iter() {
                                         ui.horizontal(|ui| {
                                             let mut note = save_file.story.knowledge.journal.contains(&entry);
                                             ui.checkbox(&mut note, format!("{:?}", entry));
