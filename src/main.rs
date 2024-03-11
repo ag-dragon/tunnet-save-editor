@@ -34,6 +34,7 @@ enum StoryState {
     TalkToScientist,
     DisinfectMainframe,
     DisinfectOtherMainframes,
+    FindAbandonedLab,
     DestroyCorruptedMainframe,
     GoToSurface,
     #[default]
@@ -57,6 +58,7 @@ impl StoryState {
             TalkToScientist,
             DisinfectMainframe,
             DisinfectOtherMainframes,
+            FindAbandonedLab,
             DestroyCorruptedMainframe,
             GoToSurface,
             TheEnd,
@@ -181,10 +183,12 @@ enum JournalEntry {
     JobDescription,
     RelayAvailable,
     HubAvailable,
+    Filter,
     FilterAvailable,
     Antivirus,
     AntivirusAvailable,
     Combo,
+    ConnectionStatus,
     CannotReachSurface,
     RobotsHaveAFearModule,
     RobotsCannotSurviveAtTheSurface,
@@ -212,6 +216,7 @@ enum JournalEntry {
     Apocalypse,
     ApocalypseDidNotHappen,
     Infection,
+    InfectionEffects,
     Stalker,
     Drone,
     DroneShowsDirection,
@@ -248,7 +253,7 @@ enum JournalEntry {
     GrandsonExists,
     VIPCodePhrase,
     VIPCode,
-    NetworkusageScientist,
+    NetworkUsageScientist,
     MadelineIsMad,
     MadelineHasAnIdea,
     MadelineTookBattery,
@@ -274,10 +279,12 @@ impl JournalEntry {
             JobDescription,
             RelayAvailable,
             HubAvailable,
+            Filter,
             FilterAvailable,
             Antivirus,
             AntivirusAvailable,
             Combo,
+            ConnectionStatus,
             CannotReachSurface,
             RobotsHaveAFearModule,
             RobotsCannotSurviveAtTheSurface,
@@ -305,6 +312,7 @@ impl JournalEntry {
             Apocalypse,
             ApocalypseDidNotHappen,
             Infection,
+            InfectionEffects,
             Stalker,
             Drone,
             DroneShowsDirection,
@@ -341,7 +349,7 @@ impl JournalEntry {
             GrandsonExists,
             VIPCodePhrase,
             VIPCode,
-            NetworkusageScientist,
+            NetworkUsageScientist,
             MadelineIsMad,
             MadelineHasAnIdea,
             MadelineTookBattery,
@@ -358,6 +366,91 @@ impl JournalEntry {
             Retire,
         ].iter().copied()
     }
+}
+
+#[derive(Serialize, Deserialize, Default, Debug)]
+struct Home {
+    items: Vec<Furniture>,
+    ads: Vec<Ad>,
+}
+
+#[derive(Serialize, Deserialize, PartialEq, Clone, Copy, Debug)]
+enum Furniture {
+    PalmTree,
+    RoundTree,
+    Shrub,
+    Oilcan,
+    Jar,
+    Server,
+    LargeBed,
+    MedicalBed,
+    RoundTable,
+    VegetableBed,
+    VendingMachine,
+    WashingMachine,
+    DjTable,
+    CreditDispenser,
+    LifeBuoy,
+    Playground,
+    Open,
+    NoticeBoard,
+    Symbol,
+    DoNotEnter,
+    RestrictedArea,
+    VIP,
+    DiggingMachine,
+    BookYoursNow,
+    EmployeesOnly,
+    Xrays,
+    SecurityCheck,
+    WorldMap,
+    HaveFaith,
+    WearHelmet,
+    WeWantYou,
+    Farmers,
+    Fields,
+    HomeSweetHome,
+    Grandson,
+    Construction,
+    Swim,
+    WashYourHands,
+    Bevy,
+    Ferries,
+    Opcodes,
+    Alphabet,
+    FakeWindows,
+    NightClubArt,
+}
+
+#[derive(Serialize, Deserialize, Debug)]
+struct Ad {
+    id: i64,
+    title: String,
+    price: i32,
+    seller: Address,
+    qty: i32,
+    item: String,
+}
+
+#[derive(Serialize, Deserialize, Debug)]
+struct Address {
+    elements: Vec<BaseFour>,
+    address_type: AddressType,
+}
+
+#[derive(Serialize, Deserialize, PartialEq, Clone, Copy, Debug)]
+enum AddressType {
+    Endpoint,
+    Filter,
+    UnrestrictedFilter,
+}
+
+#[derive(Serialize, Deserialize, PartialEq, Clone, Copy, Debug)]
+enum BaseFour {
+    Zero,
+    One,
+    Two,
+    Three,
 }
 
 #[derive(Serialize, Deserialize, Default, Debug)]
@@ -406,7 +499,7 @@ struct Story {
 
     inventory: Inventory,
     knowledge: Knowledge,
-    // home
+    home: Home,
     visited_chunks: Vec<ChunkCoords>,
     map_annotations: MapAnnotations,
 
@@ -510,7 +603,14 @@ fn editor_ui(mut contexts: EguiContexts, mut editor_tab: ResMut<EditorTab>, mut 
                         let file = File::open(path.display().to_string()).unwrap();
                         let reader = BufReader::new(file);
 
-                        *save_file = serde_json::from_reader(reader).unwrap();
+                        let deserialize_result = serde_json::from_reader(reader);
+                        match deserialize_result {
+                            Ok(result) => *save_file = result,
+                            Err(e) => {
+                                println!("{:?}", e);
+                            }
+                        };
+                        //*save_file = serde_json::from_reader(reader).unwrap();
                     }
                 }
                 if ui.button("Save").clicked() {
