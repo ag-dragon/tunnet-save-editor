@@ -92,85 +92,21 @@ enum Annotation {
     Description { color: MapColor, note: String },
 }
 
-#[derive(Serialize, Deserialize, Default, Debug)]
-struct Home {
-    items: Vec<Furniture>,
-    ads: Vec<Ad>,
-}
-
-#[derive(Serialize, Deserialize, PartialEq, Clone, Copy, Debug)]
-enum Furniture {
-    PalmTree,
-    RoundTree,
-    Shrub,
-    Oilcan,
-    Jar,
-    Server,
-    LargeBed,
-    MedicalBed,
-    RoundTable,
-    VegetableBed,
-    VendingMachine,
-    WashingMachine,
-    DjTable,
-    CreditDispenser,
-    LifeBuoy,
-    Playground,
-    Open,
-    NoticeBoard,
-    Symbol,
-    DoNotEnter,
-    RestrictedArea,
-    VIP,
-    DiggingMachine,
-    BookYoursNow,
-    EmployeesOnly,
-    Xrays,
-    SecurityCheck,
-    WorldMap,
-    HaveFaith,
-    WearHelmet,
-    WeWantYou,
-    Farmers,
-    Fields,
-    HomeSweetHome,
-    Grandson,
-    Construction,
-    Swim,
-    WashYourHands,
-    Bevy,
-    Ferries,
-    Opcodes,
-    Alphabet,
-    FakeWindows,
-    NightClubArt,
-}
-
 #[derive(Serialize, Deserialize, Debug)]
-struct Ad {
-    id: i64,
-    title: String,
-    price: i32,
-    seller: Address,
-    qty: i32,
-    item: String,
-}
-
-#[derive(Serialize, Deserialize, Debug)]
-struct Address {
+pub struct Address {
     elements: Vec<BaseFour>,
     address_type: AddressType,
 }
 
 #[derive(Serialize, Deserialize, PartialEq, Clone, Copy, Debug)]
-enum AddressType {
+pub enum AddressType {
     Endpoint,
     Filter,
     UnrestrictedFilter,
 }
 
 #[derive(Serialize, Deserialize, PartialEq, Clone, Copy, Debug)]
-enum BaseFour {
+pub enum BaseFour {
     Zero,
     One,
     Two,
@@ -178,7 +114,7 @@ enum BaseFour {
 }
 
 #[derive(Serialize, Deserialize, Default, Debug)]
-struct Story {
+pub struct Story {
     state: StoryState,
     boss_phase: BossPhase,
     companion: bool,
@@ -223,7 +159,7 @@ struct Story {
 
     inventory: player::inventory::Inventory,
     knowledge: player::journal::Knowledge,
-    home: Home,
+    home: player::home::Home,
     visited_chunks: Vec<ChunkCoords>,
     map_annotations: MapAnnotations,
 
