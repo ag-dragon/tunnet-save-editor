@@ -31,16 +31,9 @@ pub enum AddressOrVec {
 }
 
 #[derive(Serialize, Deserialize, Debug)]
-pub struct NodeCoords {
-    x: f64,
-    y: f64,
-    z: f64,
-}
-
-#[derive(Serialize, Deserialize, Debug)]
 pub struct Node {
-    pos: NodeCoords,
-    up: NodeCoords,
+    pos: [f64; 3],
+    up: [f64; 3],
     angle: f64,
 }
 

@@ -1,4 +1,3 @@
-use crate::{ChunkCoords, MapAnnotations};
 use super::shop::Shop;
 use super::inventory::Inventory;
 use super::journal::Knowledge;
@@ -6,6 +5,7 @@ use super::home::Home;
 use super::guide::Guide;
 use crate::player::PlayerMovement;
 use crate::network::AddressOrVec;
+use crate::chunks::Map;
 
 use bevy_egui::egui;
 use serde::{Serialize, Deserialize};
@@ -80,8 +80,8 @@ pub struct Story {
 
     pub home: Home,
 
-    pub visited_chunks: Vec<ChunkCoords>,
-    pub map_annotations: MapAnnotations,
+    #[serde(flatten)]
+    pub map: Map,
 
     pub connection_status: Vec<Vec<AddressOrVec>>,
 

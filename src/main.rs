@@ -1,6 +1,7 @@
 pub mod save_file;
 pub mod player;
 pub mod network;
+pub mod chunks;
 
 use save_file::SaveFile;
 
@@ -10,7 +11,6 @@ use bevy::{
 };
 use bevy_egui::{egui, EguiContexts, EguiPlugin};
 use egui::{FontData, FontDefinitions, FontFamily};
-use serde::{Serialize, Deserialize};
 use std::{fs::File, io::BufReader, io::Write};
 
 #[derive(Resource, Default)]
@@ -19,34 +19,6 @@ enum EditorTab {
     Player,
     Network,
     Chunks,
-}
-
-#[derive(Serialize, Deserialize, Default, Debug)]
-pub struct ChunkCoords {
-    x: i32,
-    y: i32,
-    z: i32,
-}
-
-#[derive(Serialize, Deserialize, Default, Debug)]
-pub struct MapAnnotations {
-    annotations: Vec<[Annotation; 2]>,
-}
-
-#[derive(Serialize, Deserialize, Default, Debug)]
-pub enum MapColor {
-    #[default]
-    Pink,
-    Yellow,
-    Green,
-    Blue,
-}
-
-#[derive(Serialize, Deserialize, Debug)]
-#[serde(untagged)]
-pub enum Annotation {
-    Coords(ChunkCoords),
-    Description { color: MapColor, note: String },
 }
 
 fn main() {
@@ -184,9 +156,7 @@ fn editor_ui(mut contexts: EguiContexts, mut editor_tab: ResMut<EditorTab>, mut 
                         network::network_editor(ui);
                     },
                     EditorTab::Chunks => {
-                        ui.vertical_centered(|ui| {
-                            ui.heading("Chunks");
-                        });
+                        chunks::chunk_editor(ui);
                     },
                 }
             });
