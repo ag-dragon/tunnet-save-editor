@@ -1,5 +1,3 @@
-use crate::save_file::SaveFile;
-
 use bevy_egui::egui;
 use serde::{Serialize, Deserialize};
 use strum::IntoEnumIterator;
@@ -7,8 +5,8 @@ use strum_macros::EnumIter;
 
 #[derive(Serialize, Deserialize, Default, Debug)]
 pub struct Knowledge {
-    pub unread: bool,
-    pub journal: Vec<JournalEntry>,
+    unread: bool,
+    journal: Vec<JournalEntry>,
 }
 
 #[derive(EnumIter, Serialize, Deserialize, PartialEq, Clone, Copy, Debug)]
@@ -105,22 +103,22 @@ pub enum JournalEntry {
     Retire,
 }
 
-pub fn journal_editor(ui: &mut egui::Ui, save_file: &mut SaveFile) {
+pub fn journal_editor(ui: &mut egui::Ui, knowledge: &mut Knowledge) {
     ui.collapsing("Journal", |ui| {
         ui.horizontal(|ui| {
-            let mut unread = save_file.story.knowledge.unread;
+            let mut unread = knowledge.unread;
             ui.checkbox(&mut unread, "Unread Symbol");
-            save_file.story.knowledge.unread = unread;
+            knowledge.unread = unread;
         });
         ui.collapsing("Entries", |ui| {
             for entry in JournalEntry::iter() {
                 ui.horizontal(|ui| {
-                    let mut note = save_file.story.knowledge.journal.contains(&entry);
+                    let mut note = knowledge.journal.contains(&entry);
                     ui.checkbox(&mut note, format!("{:?}", entry));
-                    if !note && save_file.story.knowledge.journal.contains(&entry) {
-                        save_file.story.knowledge.journal.retain(|&x| x != entry);
-                    } else if note && !save_file.story.knowledge.journal.contains(&entry) {
-                        save_file.story.knowledge.journal.push(entry);
+                    if !note && knowledge.journal.contains(&entry) {
+                        knowledge.journal.retain(|&x| x != entry);
+                    } else if note && !knowledge.journal.contains(&entry) {
+                        knowledge.journal.push(entry);
                     }
                 });
             }

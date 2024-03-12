@@ -339,8 +339,8 @@ fn editor_ui(mut contexts: EguiContexts, mut editor_tab: ResMut<EditorTab>, mut 
                             });
 
 
-                            player::inventory::inventory_editor(ui, &mut save_file);
-                            player::journal::journal_editor(ui, &mut save_file);
+                            player::inventory::inventory_editor(ui, &mut save_file.story.inventory);
+                            player::journal::journal_editor(ui, &mut save_file.story.knowledge);
                             player::home::home_editor(ui, &mut save_file.story.home);
 
                             ui.collapsing("Guidebook", |ui| {
