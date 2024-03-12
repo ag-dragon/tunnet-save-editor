@@ -3,6 +3,7 @@ use super::shop::Shop;
 use super::inventory::Inventory;
 use super::journal::Knowledge;
 use super::home::Home;
+use super::guide::Guide;
 
 use bevy_egui::egui;
 use serde::{Serialize, Deserialize};
@@ -69,8 +70,8 @@ pub struct Story {
     pub look: bool,
     pub sprint: bool,
 
-    pub page_no: i32,
-    pub pages: i32,
+    #[serde(flatten)]
+    pub guide: Guide,
 
     pub inventory: Inventory,
     pub knowledge: Knowledge,
