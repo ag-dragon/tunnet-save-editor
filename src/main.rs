@@ -1,5 +1,6 @@
 pub mod save_file;
 pub mod player;
+pub mod network;
 
 use save_file::SaveFile;
 
@@ -18,12 +19,6 @@ enum EditorTab {
     Player,
     Network,
     Chunks,
-}
-
-#[derive(Serialize, Deserialize, Default, Debug)]
-pub struct Player {
-    pos: [f64; 3],
-    credits: i32,
 }
 
 #[derive(Serialize, Deserialize, Default, Debug)]
@@ -207,9 +202,7 @@ fn editor_ui(mut contexts: EguiContexts, mut editor_tab: ResMut<EditorTab>, mut 
                         player::player_editor(ui, &mut save_file);
                     },
                     EditorTab::Network => {
-                        ui.vertical_centered(|ui| {
-                            ui.heading("Network");
-                        });
+                        network::network_editor(ui);
                     },
                     EditorTab::Chunks => {
                         ui.vertical_centered(|ui| {

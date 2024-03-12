@@ -74,8 +74,11 @@ pub struct Story {
     pub guide: Guide,
 
     pub inventory: Inventory,
+
     pub knowledge: Knowledge,
+
     pub home: Home,
+
     pub visited_chunks: Vec<ChunkCoords>,
     pub map_annotations: MapAnnotations,
 
