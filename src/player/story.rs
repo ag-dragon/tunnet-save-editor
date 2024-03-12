@@ -1,3 +1,5 @@
+use crate::save_file::SaveFile;
+
 use bevy_egui::egui;
 use serde::{Serialize, Deserialize};
 use strum::IntoEnumIterator;
@@ -97,7 +99,7 @@ pub struct Story {
     // mainframes: Vec?
 }
 
-pub fn story_editor(ui: &mut egui::Ui, save_file: &mut crate::SaveFile) {
+pub fn story_editor(ui: &mut egui::Ui, save_file: &mut SaveFile) {
     ui.collapsing("Story Progress", |ui| {
         let mut story_selected = save_file.story.state;
         egui::ComboBox::from_label("Story State")

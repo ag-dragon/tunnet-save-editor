@@ -1,3 +1,5 @@
+use crate::save_file::SaveFile;
+
 use bevy_egui::egui;
 use serde::{Serialize, Deserialize};
 use strum::IntoEnumIterator;
@@ -103,7 +105,7 @@ pub enum JournalEntry {
     Retire,
 }
 
-pub fn journal_editor(ui: &mut egui::Ui, save_file: &mut crate::SaveFile) {
+pub fn journal_editor(ui: &mut egui::Ui, save_file: &mut SaveFile) {
     ui.collapsing("Journal", |ui| {
         ui.horizontal(|ui| {
             let mut unread = save_file.story.knowledge.unread;

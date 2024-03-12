@@ -1,3 +1,5 @@
+use crate::save_file::SaveFile;
+
 use bevy_egui::egui;
 use serde::{Serialize, Deserialize};
 use strum::IntoEnumIterator;
@@ -23,7 +25,7 @@ pub enum InventoryItem {
     Oil,
 }
 
-pub fn inventory_editor(ui: &mut egui::Ui, save_file: &mut crate::SaveFile) {
+pub fn inventory_editor(ui: &mut egui::Ui, save_file: &mut SaveFile) {
     ui.collapsing("Inventory", |ui| {
         for item in InventoryItem::iter() {
             let mut item_count: i32 = 0;

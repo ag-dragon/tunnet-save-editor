@@ -1,3 +1,8 @@
+pub mod save_file;
+pub mod player;
+
+use save_file::SaveFile;
+
 use bevy::{
     prelude::*,
     winit::WinitSettings,
@@ -6,8 +11,6 @@ use bevy_egui::{egui, EguiContexts, EguiPlugin};
 use egui::{FontData, FontDefinitions, FontFamily};
 use serde::{Serialize, Deserialize};
 use std::{fs::File, io::BufReader, io::Write};
-
-pub mod player;
 
 #[derive(Resource, Default)]
 enum EditorTab {
@@ -70,12 +73,6 @@ pub enum BaseFour {
     One,
     Two,
     Three,
-}
-
-#[derive(Resource, Serialize, Deserialize, Default, Debug)]
-pub struct SaveFile {
-    player: Player,
-    story: player::story::Story,
 }
 
 fn main() {
@@ -344,7 +341,7 @@ fn editor_ui(mut contexts: EguiContexts, mut editor_tab: ResMut<EditorTab>, mut 
 
                             player::inventory::inventory_editor(ui, &mut save_file);
                             player::journal::journal_editor(ui, &mut save_file);
-                            player::home::home_editor(ui, &mut save_file);
+                            player::home::home_editor(ui, &mut save_file.story.home);
 
                             ui.collapsing("Guidebook", |ui| {
                                 // page_no

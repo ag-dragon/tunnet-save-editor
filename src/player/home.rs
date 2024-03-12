@@ -5,8 +5,8 @@ use strum_macros::EnumIter;
 
 #[derive(Serialize, Deserialize, Default, Debug)]
 pub struct Home {
-    pub items: Vec<Furniture>,
-    pub ads: Vec<Ad>,
+    items: Vec<Furniture>,
+    ads: Vec<Ad>,
 }
 
 #[derive(EnumIter, Serialize, Deserialize, PartialEq, Clone, Copy, Debug)]
@@ -59,25 +59,25 @@ pub enum Furniture {
 
 #[derive(Serialize, Deserialize, Debug)]
 pub struct Ad {
-    pub id: i64,
-    pub title: String,
-    pub price: i32,
-    pub seller: crate::Address,
-    pub qty: i32,
-    pub item: String,
+    id: i64,
+    title: String,
+    price: i32,
+    seller: crate::Address,
+    qty: i32,
+    item: String,
 }
 
-pub fn home_editor(ui: &mut egui::Ui, save_file: &mut crate::SaveFile) {
+pub fn home_editor(ui: &mut egui::Ui, home: &mut Home) {
     ui.collapsing("Home", |ui| {
         ui.collapsing("Items", |ui| {
             for item in Furniture::iter() {
                 ui.horizontal(|ui| {
-                    let mut furniture = save_file.story.home.items.contains(&item);
+                    let mut furniture = home.items.contains(&item);
                     ui.checkbox(&mut furniture, format!("{:?}", item));
-                    if !furniture && save_file.story.home.items.contains(&item) {
-                        save_file.story.home.items.retain(|&x| x != item);
-                    } else if furniture && !save_file.story.home.items.contains(&item) {
-                        save_file.story.home.items.push(item);
+                    if !furniture && home.items.contains(&item) {
+                        home.items.retain(|&x| x != item);
+                    } else if furniture && !home.items.contains(&item) {
+                        home.items.push(item);
                     }
                 });
             }
