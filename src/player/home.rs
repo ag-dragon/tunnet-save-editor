@@ -1,3 +1,5 @@
+use crate::network::Address;
+
 use bevy_egui::egui;
 use serde::{Serialize, Deserialize};
 use strum::IntoEnumIterator;
@@ -62,7 +64,7 @@ pub struct Ad {
     id: i64,
     title: String,
     price: i32,
-    seller: crate::Address,
+    seller: Address,
     qty: i32,
     item: String,
 }

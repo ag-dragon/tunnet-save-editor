@@ -5,6 +5,7 @@ use super::journal::Knowledge;
 use super::home::Home;
 use super::guide::Guide;
 use crate::player::PlayerMovement;
+use crate::network::AddressOrVec;
 
 use bevy_egui::egui;
 use serde::{Serialize, Deserialize};
@@ -82,9 +83,10 @@ pub struct Story {
     pub visited_chunks: Vec<ChunkCoords>,
     pub map_annotations: MapAnnotations,
 
-    //connection_status: Vec
-    // streaks?
-    // mainframes: Vec?
+    pub connection_status: Vec<Vec<AddressOrVec>>,
+
+    streaks: Vec<i32>, // Placeholder: I've never seen streaks contain any data
+    mainframes: Vec<i32>, // Placeholder: I've never seen mainframes contain any data
 }
 
 pub fn story_editor(ui: &mut egui::Ui, story: &mut Story) {

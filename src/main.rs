@@ -49,27 +49,6 @@ pub enum Annotation {
     Description { color: MapColor, note: String },
 }
 
-#[derive(Serialize, Deserialize, Debug)]
-pub struct Address {
-    elements: Vec<BaseFour>,
-    address_type: AddressType,
-}
-
-#[derive(Serialize, Deserialize, PartialEq, Clone, Copy, Debug)]
-pub enum AddressType {
-    Endpoint,
-    Filter,
-    UnrestrictedFilter,
-}
-
-#[derive(Serialize, Deserialize, PartialEq, Clone, Copy, Debug)]
-pub enum BaseFour {
-    Zero,
-    One,
-    Two,
-    Three,
-}
-
 fn main() {
     App::new()
         .add_plugins(DefaultPlugins)
