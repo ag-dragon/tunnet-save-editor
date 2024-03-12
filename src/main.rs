@@ -204,49 +204,7 @@ fn editor_ui(mut contexts: EguiContexts, mut editor_tab: ResMut<EditorTab>, mut 
             egui::ScrollArea::vertical().show(ui, |ui| {
                 match *editor_tab {
                     EditorTab::Player => {
-                        ui.vertical_centered(|ui| {
-                            ui.heading("Player");
-
-
-                            ui.collapsing("Player Data", |ui| {
-                                ui.collapsing("Player Position", |ui| {
-                                    ui.horizontal(|ui| {
-                                        let mut px = save_file.player.pos[0];
-                                        ui.add(egui::DragValue::new(&mut px).speed(0.1).prefix("x: "));
-                                        save_file.player.pos[0] = px;
-                                        let mut py = save_file.player.pos[1];
-                                        ui.add(egui::DragValue::new(&mut py).speed(0.1).prefix("y: "));
-                                        save_file.player.pos[1] = py;
-                                        let mut pz = save_file.player.pos[2];
-                                        ui.add(egui::DragValue::new(&mut pz).speed(0.1).prefix("z: "));
-                                        save_file.player.pos[2] = pz;
-                                    });
-                                });
-                                ui.horizontal(|ui| {
-                                    ui.label("Credits:");
-                                    let mut credits = save_file.player.credits;
-                                    ui.add(egui::DragValue::new(&mut credits).speed(0.1));
-                                    save_file.player.credits = credits;
-                                });
-                                ui.horizontal(|ui| {
-                                    let mut movement = save_file.story.movement;
-                                    ui.checkbox(&mut movement, "Can Walk/Sprint");
-                                    save_file.story.movement = movement;
-                                });
-                                ui.horizontal(|ui| {
-                                    let mut look = save_file.story.look;
-                                    ui.checkbox(&mut look, "Can Move Camera");
-                                    save_file.story.look = look;
-                                });
-                            });
-
-
-                            player::shop::shop_editor(ui, &mut save_file.story.shop);
-                            player::inventory::inventory_editor(ui, &mut save_file.story.inventory);
-                            player::journal::journal_editor(ui, &mut save_file.story.knowledge);
-                            player::home::home_editor(ui, &mut save_file.story.home);
-                            player::guide::guide_editor(ui, &mut save_file.story.guide);
-                        });
+                        player::player_editor(ui, &mut save_file);
                     },
                     EditorTab::Network => {
                         ui.vertical_centered(|ui| {

@@ -1,4 +1,4 @@
-use crate::Player;
+use crate::player::Player;
 use crate::player::story::Story;
 
 use bevy::ecs::system::Resource;
