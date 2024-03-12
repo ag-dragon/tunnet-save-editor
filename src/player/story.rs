@@ -4,6 +4,7 @@ use super::inventory::Inventory;
 use super::journal::Knowledge;
 use super::home::Home;
 use super::guide::Guide;
+use crate::player::PlayerMovement;
 
 use bevy_egui::egui;
 use serde::{Serialize, Deserialize};
@@ -66,9 +67,8 @@ pub struct Story {
     #[serde(flatten)]
     pub shop: Shop,
 
-    pub movement: bool,
-    pub look: bool,
-    pub sprint: bool,
+    #[serde(flatten)]
+    pub player_movement: PlayerMovement,
 
     #[serde(flatten)]
     pub guide: Guide,

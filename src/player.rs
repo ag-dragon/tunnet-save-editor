@@ -16,6 +16,13 @@ pub struct Player {
     credits: i32,
 }
 
+#[derive(Serialize, Deserialize, Default, Debug)]
+pub struct PlayerMovement {
+    movement: bool,
+    look: bool,
+    sprint: bool,
+}
+
 pub fn player_editor(ui: &mut egui::Ui, save_file: &mut SaveFile) {
     ui.vertical_centered(|ui| {
         ui.heading("Player");
@@ -43,14 +50,14 @@ pub fn player_editor(ui: &mut egui::Ui, save_file: &mut SaveFile) {
             save_file.player.credits = credits;
         });
         ui.horizontal(|ui| {
-            let mut movement = save_file.story.movement;
+            let mut movement = save_file.story.player_movement.movement;
             ui.checkbox(&mut movement, "Can Walk/Sprint");
-            save_file.story.movement = movement;
+            save_file.story.player_movement.movement = movement;
         });
         ui.horizontal(|ui| {
-            let mut look = save_file.story.look;
+            let mut look = save_file.story.player_movement.look;
             ui.checkbox(&mut look, "Can Move Camera");
-            save_file.story.look = look;
+            save_file.story.player_movement.look = look;
         });
     });
 
