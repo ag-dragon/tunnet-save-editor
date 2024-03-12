@@ -1,4 +1,8 @@
+use crate::{ChunkCoords, MapAnnotations};
 use super::shop::Shop;
+use super::inventory::Inventory;
+use super::journal::Knowledge;
+use super::home::Home;
 
 use bevy_egui::egui;
 use serde::{Serialize, Deserialize};
@@ -68,11 +72,11 @@ pub struct Story {
     pub page_no: i32,
     pub pages: i32,
 
-    pub inventory: crate::player::inventory::Inventory,
-    pub knowledge: crate::player::journal::Knowledge,
-    pub home: crate::player::home::Home,
-    pub visited_chunks: Vec<crate::ChunkCoords>,
-    pub map_annotations: crate::MapAnnotations,
+    pub inventory: Inventory,
+    pub knowledge: Knowledge,
+    pub home: Home,
+    pub visited_chunks: Vec<ChunkCoords>,
+    pub map_annotations: MapAnnotations,
 
     //connection_status: Vec
     // streaks?
