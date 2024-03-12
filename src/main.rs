@@ -5,9 +5,7 @@ use bevy::{
 use bevy_egui::{egui, EguiContexts, EguiPlugin};
 use egui::{FontData, FontDefinitions, FontFamily};
 use serde::{Serialize, Deserialize};
-use strum::IntoEnumIterator;
-use strum_macros::EnumIter;
-use std::{fs::File, io::BufReader, io::Write, collections::HashMap};
+use std::{fs::File, io::BufReader, io::Write};
 
 pub mod player;
 
@@ -20,64 +18,25 @@ enum EditorTab {
 }
 
 #[derive(Serialize, Deserialize, Default, Debug)]
-struct Player {
+pub struct Player {
     pos: [f64; 3],
     credits: i32,
 }
 
-#[derive(EnumIter, Serialize, Deserialize, PartialEq, Clone, Copy, Default, Debug)]
-enum StoryState {
-    BootUp,
-    Setup,
-    PressButton,
-    ConnectRelayToMainframe,
-    ConnectEndpointToMainframe,
-    UseHub,
-    UseScan,
-    ConnectToShelters,
-    TalkToScientist,
-    DisinfectMainframe,
-    DisinfectOtherMainframes,
-    FindAbandonedLab,
-    DestroyCorruptedMainframe,
-    GoToSurface,
-    #[default]
-    TheEnd,
-    Review,
-    DemoEnd,
-}
-
-#[derive(EnumIter, Serialize, Deserialize, PartialEq, Clone, Copy, Default, Debug)]
-enum BossPhase {
-    #[default]
-    InfectMainframeWithAB,
-    InfectMainframeWithABCD,
-    KillswitchOne,
-    KillswitchTwo,
-    KillswitchThree,
-    KillswitchFour,
-    DisinfectEndpointOne,
-    DisinfectEndpointTwo,
-    DisinfectEndpointThree,
-    DisinfectEndpointFour,
-    DisinfectMainframe,
-    Destroyed,
-}
-
 #[derive(Serialize, Deserialize, Default, Debug)]
-struct ChunkCoords {
+pub struct ChunkCoords {
     x: i32,
     y: i32,
     z: i32,
 }
 
 #[derive(Serialize, Deserialize, Default, Debug)]
-struct MapAnnotations {
+pub struct MapAnnotations {
     annotations: Vec<[Annotation; 2]>,
 }
 
 #[derive(Serialize, Deserialize, Default, Debug)]
-enum MapColor {
+pub enum MapColor {
     #[default]
     Pink,
     Yellow,
@@ -87,7 +46,7 @@ enum MapColor {
 
 #[derive(Serialize, Deserialize, Debug)]
 #[serde(untagged)]
-enum Annotation {
+pub enum Annotation {
     Coords(ChunkCoords),
     Description { color: MapColor, note: String },
 }
@@ -113,65 +72,10 @@ pub enum BaseFour {
     Three,
 }
 
-#[derive(Serialize, Deserialize, Default, Debug)]
-pub struct Story {
-    state: StoryState,
-    boss_phase: BossPhase,
-    companion: bool,
-    surface: bool,
-    review: bool,
-    disinfected: i32,
-    disinfection_dialog: i32,
-    military_cleared: bool,
-    luxury_cleared: bool,
-    monastry_cleared: bool,
-    researchlab_cleared: bool,
-
-    shop_level: i32,
-    digging: bool,
-    relay: bool,
-    hub: bool,
-    filter: bool,
-    scan_short: bool,
-    scan_long: bool,
-    jetpack: bool,
-    antivirus: bool,
-    optical_fiber: bool,
-    antenna: bool,
-    tester: bool,
-    relay_light: bool,
-    patch: bool, //?
-    filter_collision: bool,
-    filter_full_address: bool,
-    tester_repeat: bool,
-    tester_spoof: bool,
-    tester_snoop: bool,
-    scan_short_enhanced: bool,
-    scan_long_peers: bool,
-    auto_map: bool,
-
-    movement: bool,
-    look: bool,
-    sprint: bool,
-
-    page_no: i32,
-    pages: i32,
-
-    inventory: player::inventory::Inventory,
-    knowledge: player::journal::Knowledge,
-    home: player::home::Home,
-    visited_chunks: Vec<ChunkCoords>,
-    map_annotations: MapAnnotations,
-
-    //connection_status: Vec
-    // streaks?
-    // mainframes: Vec?
-}
-
 #[derive(Resource, Serialize, Deserialize, Default, Debug)]
-struct SaveFile {
+pub struct SaveFile {
     player: Player,
-    story: Story,
+    story: player::story::Story,
 }
 
 fn main() {
@@ -437,61 +341,6 @@ fn editor_ui(mut contexts: EguiContexts, mut editor_tab: ResMut<EditorTab>, mut 
                                 });
                             });
 
-                            ui.collapsing("Story Progress", |ui| {
-                                let mut story_selected = save_file.story.state;
-                                egui::ComboBox::from_label("Story State")
-                                        .selected_text(format!("{:?}", story_selected))
-                                        .show_ui(ui, |ui| {
-                                    for story_state in StoryState::iter() {
-                                        ui.selectable_value(&mut story_selected, story_state, format!("{:?}", story_state));
-                                    }
-                                });
-                                save_file.story.state = story_selected;
-                                let mut boss_selected = save_file.story.boss_phase;
-                                egui::ComboBox::from_label("Boss State")
-                                        .selected_text(format!("{:?}", boss_selected))
-                                        .show_ui(ui, |ui| {
-                                    for boss_state in BossPhase::iter() {
-                                        ui.selectable_value(&mut boss_selected, boss_state, format!("{:?}", boss_state));
-                                    }
-                                });
-                                save_file.story.boss_phase = boss_selected;
-                                ui.horizontal(|ui| {
-                                    let mut researchlab_cleared = save_file.story.researchlab_cleared;
-                                    ui.checkbox(&mut researchlab_cleared, "Research Lab Cleared");
-                                    save_file.story.researchlab_cleared = researchlab_cleared;
-                                });
-                                ui.horizontal(|ui| {
-                                    let mut military_cleared = save_file.story.military_cleared;
-                                    ui.checkbox(&mut military_cleared, "Military Outpost Cleared");
-                                    save_file.story.military_cleared = military_cleared;
-                                });
-                                ui.horizontal(|ui| {
-                                    let mut monastry_cleared = save_file.story.monastry_cleared;
-                                    ui.checkbox(&mut monastry_cleared, "Monastry Cleared");
-                                    save_file.story.monastry_cleared = monastry_cleared;
-                                });
-                                ui.horizontal(|ui| {
-                                    let mut luxury_cleared = save_file.story.luxury_cleared;
-                                    ui.checkbox(&mut luxury_cleared, "Villa Cleared");
-                                    save_file.story.luxury_cleared = luxury_cleared;
-                                });
-                                ui.horizontal(|ui| {
-                                    let mut companion = save_file.story.companion;
-                                    ui.checkbox(&mut companion, "Drone Companion");
-                                    save_file.story.companion = companion;
-                                });
-                                ui.horizontal(|ui| {
-                                    let mut surface = save_file.story.surface;
-                                    ui.checkbox(&mut surface, "Surface unlocked");
-                                    save_file.story.surface = surface;
-                                });
-                                ui.horizontal(|ui| {
-                                    let mut review = save_file.story.review;
-                                    ui.checkbox(&mut review, "End Review Available");
-                                    save_file.story.review = review;
-                                });
-                            });
 
                             player::inventory::inventory_editor(ui, &mut save_file);
                             player::journal::journal_editor(ui, &mut save_file);
