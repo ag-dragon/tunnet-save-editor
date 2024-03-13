@@ -5,7 +5,7 @@ use super::home::Home;
 use super::guide::Guide;
 use crate::player::PlayerMovement;
 use crate::network::AddressOrVec;
-use crate::chunks::Map;
+use crate::chunks::map::Map;
 
 use bevy_egui::egui;
 use serde::{Serialize, Deserialize};

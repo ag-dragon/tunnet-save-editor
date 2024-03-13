@@ -1,7 +1,8 @@
-pub mod save_file;
-pub mod player;
-pub mod network;
-pub mod chunks;
+mod save_file;
+mod player;
+mod network;
+mod chunks;
+mod chunk_renderer;
 
 use save_file::SaveFile;
 
@@ -31,10 +32,10 @@ fn main() {
         .insert_resource(WinitSettings::desktop_app())
         .init_resource::<EditorTab>()
         .init_resource::<SaveFile>()
-        .add_systems(Startup, chunks::chunk_setup)
+        .add_systems(Startup, chunk_renderer::chunk_setup)
         .add_systems(Startup, editor_ui_setup)
         .add_systems(Update, editor_ui)
-        .add_systems(Update, chunks::draw_chunk)
+        .add_systems(Update, chunk_renderer::draw_chunk)
         .run();
 }
 

@@ -1,7 +1,7 @@
 use crate::player::Player;
 use crate::player::story::Story;
 use crate::network::Network;
-use crate::chunks::ChunkData;
+use crate::chunks::Chunks;
 
 use bevy::ecs::system::Resource;
 use serde::{Serialize, Deserialize};
@@ -13,7 +13,7 @@ pub struct SaveFile {
     #[serde(flatten)]
     pub network: Network,
     #[serde(flatten)]
-    pub chunk_data: ChunkData,
+    pub chunk_data: Chunks,
 
     toolboxes: Vec<[f64; 3]>,
 }
