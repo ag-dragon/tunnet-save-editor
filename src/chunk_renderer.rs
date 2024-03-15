@@ -1,10 +1,33 @@
 use crate::chunks::voxels::VoxelType;
 
-use bevy::prelude::*;
+use bevy::{
+    prelude::*,
+    render::{
+        render_asset::RenderAssetUsages,
+        mesh::{
+            PrimitiveTopology,
+            VertexAttributeValues,
+            Indices,
+        },
+    },
+};
 use bevy_panorbit_camera::PanOrbitCamera;
+use block_mesh::{
+    ndshape::{ConstShape, ConstShape3u32},
+    RIGHT_HANDED_Y_UP_CONFIG,
+    visible_block_faces,
+    UnitQuadBuffer,
+    OrientedBlockFace,
+};
+
+const CHUNK_WIDTH: u32 = 32;
+const PADDED_CHUNK_WIDTH: u32 = 34;
+type ChunkShape = ConstShape3u32<CHUNK_WIDTH, CHUNK_WIDTH, CHUNK_WIDTH>;
+type PaddedChunkShape = ConstShape3u32<PADDED_CHUNK_WIDTH, PADDED_CHUNK_WIDTH, PADDED_CHUNK_WIDTH>;
 
 pub fn chunk_setup(
     mut commands: Commands,
+    asset_server: Res<AssetServer>,
     mut meshes: ResMut<Assets<Mesh>>,
     mut materials: ResMut<Assets<StandardMaterial>>,
 ) {
@@ -15,32 +38,118 @@ pub fn chunk_setup(
     });
 
     // camera
-    commands.spawn((Camera3dBundle {
-        transform: Transform::from_xyz(32.0, 64.0, 64.0).looking_at(Vec3::new(16.5, 16.5, 16.5), Vec3::Y),
-        ..default()
-    }, PanOrbitCamera::default()));
-
-    let mesh = meshes.add(Cuboid::new(0.1, 0.1, 0.1));
-    for z in 0..32 {
-        for y in 0..32 {
-            for x in 0..32 {
-                commands.spawn((PbrBundle {
-                    mesh: mesh.clone(),
-                    material: materials.add(Color::WHITE),
-                    transform: Transform::from_xyz(x as f32, y as f32, z as f32),
-                    visibility: Visibility::Hidden,
-                    ..default()
-                },VoxelType::Air));
-            }
+    commands.spawn((
+        Camera3dBundle {
+            transform: Transform::from_xyz(32.0, 64.0, 64.0),
+            ..default()
+        },
+        PanOrbitCamera {
+            focus: Vec3::new(16.5, 16.5, 16.5),
+            ..default()
         }
-    }
+    ));
+
+
+    let mut voxels = [VoxelType::Dirt; ChunkShape::SIZE as usize];
+    let render_mesh = generate_chunk_mesh(voxels);
+
+    // Render mesh
+    let custom_texture_handle: Handle<Image> = asset_server.load("textures/array_texture.png");
+    let custom_mesh_handle: Handle<Mesh> = meshes.add(render_mesh);
+
+    commands.spawn((
+        PbrBundle {
+            mesh: custom_mesh_handle,
+            material: materials.add(StandardMaterial {
+                base_color_texture: Some(custom_texture_handle),
+                ..default()
+            }),
+            ..default()
+        },
+    ));
 }
 
-pub fn draw_chunk(
-    mut commands: Commands,
-    mut query: Query<(&Transform, &mut Visibility, &mut VoxelType)>
-) {
-    for (tranform, mut visibility, voxel_type) in query.iter_mut() {
-        *visibility = Visibility::Visible;
+fn pad_voxels(voxels: [VoxelType; ChunkShape::SIZE as usize]) -> [VoxelType; PaddedChunkShape::SIZE as usize] {
+    let mut padded_voxels = [VoxelType::Air; PaddedChunkShape::SIZE as usize];
+    for i in 0..ChunkShape::SIZE {
+        let [x, y, z] = ChunkShape::delinearize(i);
+        padded_voxels[PaddedChunkShape::linearize([x+1, y+1, z+1]) as usize] = voxels[i as usize];
     }
+    padded_voxels
+}
+
+fn generate_chunk_mesh(voxels: [VoxelType; ChunkShape::SIZE as usize]) -> Mesh {
+    let padded_voxels = pad_voxels(voxels);
+
+    let mut buffer: UnitQuadBuffer = UnitQuadBuffer::new();
+    visible_block_faces(
+        &padded_voxels,
+        &PaddedChunkShape {},
+        [0; 3],
+        [33; 3],
+        &RIGHT_HANDED_Y_UP_CONFIG.faces,
+        &mut buffer,
+    );
+
+    mesh_from_quads(buffer)
+}
+
+// Function heavily inspired by mesh_from_quads function from bevy_voxel_world crate
+fn mesh_from_quads(quads: UnitQuadBuffer) -> Mesh {
+    let num_indices = quads.num_quads() * 6;
+    let num_vertices = quads.num_quads() * 4;
+
+    let mut indices = Vec::with_capacity(num_indices);
+    let mut positions = Vec::with_capacity(num_vertices);
+    let mut normals = Vec::with_capacity(num_vertices);
+    let mut tex_coords = Vec::with_capacity(num_vertices);
+
+    for (group, face)  in quads.groups.into_iter()
+            .zip(RIGHT_HANDED_Y_UP_CONFIG.faces.into_iter()) {
+        for quad in group.into_iter() {
+            let normal = IVec3::from([
+                face.signed_normal().x,
+                face.signed_normal().y,
+                face.signed_normal().z,
+            ]);
+
+            indices.extend_from_slice(&face.quad_mesh_indices(positions.len() as u32));
+
+            positions.extend_from_slice(&face.quad_mesh_positions(&quad.into(), 1.0));
+
+            normals.extend_from_slice(&face.quad_mesh_normals());
+
+            tex_coords.extend_from_slice(&face.tex_coords(
+                RIGHT_HANDED_Y_UP_CONFIG.u_flip_face,
+                true,
+                &quad.into(),
+            ).map(|coords|
+                coords.map(|coord|
+                    coord / 4.0
+                )
+            ));
+        }
+    }
+
+    let mut render_mesh = Mesh::new(
+        PrimitiveTopology::TriangleList,
+        RenderAssetUsages::default(),
+    );
+
+    render_mesh.insert_attribute(
+        Mesh::ATTRIBUTE_POSITION,
+        VertexAttributeValues::Float32x3(positions.clone()),
+    );
+    render_mesh.insert_attribute(
+        Mesh::ATTRIBUTE_NORMAL,
+        VertexAttributeValues::Float32x3(normals),
+    );
+    render_mesh.insert_attribute(
+        Mesh::ATTRIBUTE_UV_0,
+        VertexAttributeValues::Float32x2(tex_coords),
+    );
+
+    render_mesh.insert_indices(Indices::U32(indices.clone()));
+
+    render_mesh
 }

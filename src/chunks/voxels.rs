@@ -1,7 +1,9 @@
 use bevy::ecs::component::Component;
+use block_mesh::{Voxel, VoxelVisibility};
 
-#[derive(Component)]
+#[derive(Copy, Clone, Debug, PartialEq, Eq, Default)]
 pub enum VoxelType {
+    #[default]
     Air,
     Dirt,
     UnbreakableDirt,
@@ -47,4 +49,14 @@ pub enum VoxelType {
     Air7,
     Air8,
     DamagedRock,
+}
+
+impl Voxel for VoxelType {
+    fn get_visibility(&self) -> VoxelVisibility {
+        if *self == VoxelType::Air {
+            VoxelVisibility::Empty
+        } else {
+            VoxelVisibility::Opaque
+        }
+    }
 }

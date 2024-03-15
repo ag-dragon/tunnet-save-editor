@@ -25,7 +25,9 @@ enum EditorTab {
 
 fn main() {
     App::new()
-        .add_plugins(DefaultPlugins)
+        .add_plugins(DefaultPlugins.set(
+            ImagePlugin::default_nearest(),
+        ))
         .add_plugins(EguiPlugin)
         .add_plugins(PanOrbitCameraPlugin)
         .insert_resource(ClearColor(Color::rgb(0.1, 0.1, 0.1)))
@@ -35,7 +37,6 @@ fn main() {
         .add_systems(Startup, chunk_renderer::chunk_setup)
         .add_systems(Startup, editor_ui_setup)
         .add_systems(Update, editor_ui)
-        .add_systems(Update, chunk_renderer::draw_chunk)
         .run();
 }
 
