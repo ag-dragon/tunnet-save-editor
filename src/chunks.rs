@@ -14,6 +14,16 @@ pub struct ChunkCoords {
     z: i32,
 }
 
+impl ChunkCoords {
+    pub fn new(x: i32, y: i32, z: i32) -> Self {
+        ChunkCoords {
+            x,
+            y,
+            z,
+        }
+    }
+}
+
 #[derive(Serialize, Deserialize, Debug)]
 #[serde(untagged)]
 pub enum Chunk {

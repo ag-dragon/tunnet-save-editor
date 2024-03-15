@@ -34,9 +34,10 @@ fn main() {
         .insert_resource(WinitSettings::desktop_app())
         .init_resource::<EditorTab>()
         .init_resource::<SaveFile>()
+        .add_event::<chunk_renderer::GenBlockMeshEvent>()
         .add_systems(Startup, chunk_renderer::chunk_setup)
         .add_systems(Startup, editor_ui_setup)
-        .add_systems(Update, editor_ui)
+        .add_systems(Update, (editor_ui, chunk_renderer::update_chunk))
         .run();
 }
 

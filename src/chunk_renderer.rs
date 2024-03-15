@@ -1,5 +1,7 @@
 use crate::chunks::voxels::VoxelType;
 
+use crate::chunks::ChunkCoords;
+
 use bevy::{
     prelude::*,
     render::{
@@ -25,11 +27,15 @@ const PADDED_CHUNK_WIDTH: u32 = 34;
 type ChunkShape = ConstShape3u32<CHUNK_WIDTH, CHUNK_WIDTH, CHUNK_WIDTH>;
 type PaddedChunkShape = ConstShape3u32<PADDED_CHUNK_WIDTH, PADDED_CHUNK_WIDTH, PADDED_CHUNK_WIDTH>;
 
+#[derive(Component)]
+pub struct BlockMesh;
+
 pub fn chunk_setup(
     mut commands: Commands,
     asset_server: Res<AssetServer>,
     mut meshes: ResMut<Assets<Mesh>>,
     mut materials: ResMut<Assets<StandardMaterial>>,
+    mut ev_genblockmesh: EventWriter<GenBlockMeshEvent>,
 ) {
     // light
     commands.insert_resource(AmbientLight {
@@ -50,12 +56,8 @@ pub fn chunk_setup(
     ));
 
 
-    let mut voxels = [VoxelType::Dirt; ChunkShape::SIZE as usize];
-    let render_mesh = generate_chunk_mesh(voxels);
-
-    // Render mesh
     let custom_texture_handle: Handle<Image> = asset_server.load("textures/array_texture.png");
-    let custom_mesh_handle: Handle<Mesh> = meshes.add(render_mesh);
+    let custom_mesh_handle: Handle<Mesh> = meshes.add(Cuboid::new(1.0, 1.0, 1.0));
 
     commands.spawn((
         PbrBundle {
@@ -66,7 +68,34 @@ pub fn chunk_setup(
             }),
             ..default()
         },
+        BlockMesh,
     ));
+
+    ev_genblockmesh.send(GenBlockMeshEvent(ChunkCoords::new(0, 0, 0)));
+}
+
+#[derive(Event)]
+pub struct GenBlockMeshEvent(ChunkCoords);
+
+pub fn update_chunk(
+    mut ev_genblockmesh: EventReader<GenBlockMeshEvent>,
+    mut meshes: ResMut<Assets<Mesh>>,
+    mut query: Query<&Handle<Mesh>, With<BlockMesh>>,
+) {
+    for ev in ev_genblockmesh.read() {
+        let handle = query.get_single_mut().expect("More than one voxel mesh");
+        if let Some(mesh) = meshes.get_mut(handle.id()) {
+            let mut voxels = [VoxelType::Air; ChunkShape::SIZE as usize];
+            for i in 0..ChunkShape::SIZE {
+                let [x, y, z] = ChunkShape::delinearize(i);
+                if x == 1 || y == 1 || z == 1 {
+                    voxels[i as usize] = VoxelType::Dirt;
+                }
+            }
+
+            *mesh = generate_chunk_mesh(voxels);
+        }
+    }
 }
 
 fn pad_voxels(voxels: [VoxelType; ChunkShape::SIZE as usize]) -> [VoxelType; PaddedChunkShape::SIZE as usize] {
