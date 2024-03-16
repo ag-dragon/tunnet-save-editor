@@ -25,6 +25,9 @@ enum EditorTab {
     Chunks,
 }
 
+#[derive(Resource, Default)]
+struct CurrentChunk(ChunkCoords);
+
 fn main() {
     App::new()
         .add_plugins(DefaultPlugins.set(
@@ -36,6 +39,7 @@ fn main() {
         .insert_resource(WinitSettings::desktop_app())
         .init_resource::<EditorTab>()
         .init_resource::<SaveFile>()
+        .init_resource::<CurrentChunk>()
         .add_event::<chunk_renderer::GenBlockMeshEvent>()
         .add_systems(Startup, chunk_renderer::chunk_setup)
         .add_systems(Startup, editor_ui_setup)
@@ -67,6 +71,7 @@ fn editor_ui(
     mut contexts: EguiContexts,
     mut editor_tab: ResMut<EditorTab>,
     mut save_file: ResMut<SaveFile>,
+    mut current_chunk: ResMut<CurrentChunk>,
     mut ev_genblockmesh: EventWriter<GenBlockMeshEvent>,
 ) {
     let ctx = contexts.ctx_mut();
@@ -92,7 +97,11 @@ fn editor_ui(
                                 println!("{:?}", e);
                             }
                         };
-                        ev_genblockmesh.send(GenBlockMeshEvent(ChunkCoords::new(4, 0, 5)));
+
+                        current_chunk.0.x = 4;
+                        current_chunk.0.y = 0;
+                        current_chunk.0.z = 4;
+                        ev_genblockmesh.send(GenBlockMeshEvent);
                         //*save_file = serde_json::from_reader(reader).unwrap();
                     }
                 }
@@ -132,7 +141,7 @@ fn editor_ui(
                         network::network_editor(ui);
                     },
                     EditorTab::Chunks => {
-                        chunks::chunk_editor(ui);
+                        chunks::chunk_editor(ui, ev_genblockmesh, current_chunk);
                     },
                 }
             });

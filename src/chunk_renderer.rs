@@ -1,5 +1,6 @@
 use crate::chunks::voxels::VoxelType;
 
+use crate::CurrentChunk;
 use crate::chunks::{ChunkCoords, Chunk};
 use crate::save_file::SaveFile;
 
@@ -72,23 +73,24 @@ pub fn chunk_setup(
         BlockMesh,
     ));
 
-    ev_genblockmesh.send(GenBlockMeshEvent(ChunkCoords::new(4, 0, 5)));
+    ev_genblockmesh.send(GenBlockMeshEvent);
 }
 
 #[derive(Event)]
-pub struct GenBlockMeshEvent(pub ChunkCoords);
+pub struct GenBlockMeshEvent;
 
 pub fn update_chunk(
     mut ev_genblockmesh: EventReader<GenBlockMeshEvent>,
     mut meshes: ResMut<Assets<Mesh>>,
     mut query: Query<&Handle<Mesh>, With<BlockMesh>>,
     save_file: Res<SaveFile>,
+    current_chunk: ResMut<CurrentChunk>,
 ) {
     for ev in ev_genblockmesh.read() {
         let mut voxels = [VoxelType::Dirt; ChunkShape::SIZE as usize];
         for chunk in &save_file.chunk_data.chunks {
             if let Chunk::Coords(chunk_coords) = &chunk[0] {
-                if *chunk_coords == ev.0 {
+                if *chunk_coords == current_chunk.0 {
                     if let Chunk::Data(rle_chunk) = &chunk[1] {
                         let voxel_data = decode_rle(rle_chunk);
                         for i in 0..ChunkShape::SIZE {
