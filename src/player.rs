@@ -12,7 +12,7 @@ use serde::{Serialize, Deserialize};
 
 #[derive(Serialize, Deserialize, Default, Debug)]
 pub struct Player {
-    pos: [f64; 3],
+    pub pos: [f64; 3],
     credits: i32,
 }
 
