@@ -5,6 +5,8 @@ mod chunks;
 mod chunk_renderer;
 
 use save_file::SaveFile;
+use chunk_renderer::{GenBlockMeshEvent};
+use chunks::ChunkCoords;
 
 use bevy::{
     prelude::*,
@@ -61,7 +63,12 @@ fn editor_ui_setup(mut contexts: EguiContexts) {
     // Change styling
 }
 
-fn editor_ui(mut contexts: EguiContexts, mut editor_tab: ResMut<EditorTab>, mut save_file: ResMut<SaveFile>) {
+fn editor_ui(
+    mut contexts: EguiContexts,
+    mut editor_tab: ResMut<EditorTab>,
+    mut save_file: ResMut<SaveFile>,
+    mut ev_genblockmesh: EventWriter<GenBlockMeshEvent>,
+) {
     let ctx = contexts.ctx_mut();
     egui::SidePanel::left("side_panel")
         .default_width(200.0)
@@ -85,6 +92,7 @@ fn editor_ui(mut contexts: EguiContexts, mut editor_tab: ResMut<EditorTab>, mut 
                                 println!("{:?}", e);
                             }
                         };
+                        ev_genblockmesh.send(GenBlockMeshEvent(ChunkCoords::new(4, 0, 5)));
                         //*save_file = serde_json::from_reader(reader).unwrap();
                     }
                 }

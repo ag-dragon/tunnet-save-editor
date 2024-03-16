@@ -7,7 +7,7 @@ use rooms::ChunkType;
 use bevy_egui::egui;
 use serde::{Serialize, Deserialize};
 
-#[derive(Serialize, Deserialize, Default, Debug)]
+#[derive(Serialize, Deserialize, PartialEq, Eq, Default, Debug)]
 pub struct ChunkCoords {
     x: i32,
     y: i32,
@@ -34,7 +34,7 @@ pub enum Chunk {
 #[derive(Serialize, Deserialize, Default, Debug)]
 pub struct Chunks {
     chunk_types: Vec<Vec<ChunkType>>,
-    chunks: Vec<Vec<Chunk>>,
+    pub chunks: Vec<Vec<Chunk>>,
 }
 
 pub fn chunk_editor(ui: &mut egui::Ui) {

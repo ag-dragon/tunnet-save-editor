@@ -4,7 +4,7 @@ use block_mesh::{Voxel, VoxelVisibility};
 #[derive(Copy, Clone, Debug, PartialEq, Eq, Default)]
 pub enum VoxelType {
     #[default]
-    Air,
+    Air = 0,
     Dirt,
     UnbreakableDirt,
     Grass,
@@ -57,6 +57,18 @@ impl Voxel for VoxelType {
             VoxelVisibility::Empty
         } else {
             VoxelVisibility::Opaque
+        }
+    }
+}
+
+impl TryFrom<i32> for VoxelType {
+    type Error = &'static str;
+
+    fn try_from(value: i32) -> Result<Self, Self::Error> {
+        match value {
+            0 => Ok(VoxelType::Air),
+            1 => Ok(VoxelType::Dirt),
+            _ => Ok(VoxelType::Dirt),
         }
     }
 }

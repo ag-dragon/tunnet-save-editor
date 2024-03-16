@@ -1,6 +1,7 @@
 use crate::chunks::voxels::VoxelType;
 
-use crate::chunks::ChunkCoords;
+use crate::chunks::{ChunkCoords, Chunk};
+use crate::save_file::SaveFile;
 
 use bevy::{
     prelude::*,
@@ -71,31 +72,46 @@ pub fn chunk_setup(
         BlockMesh,
     ));
 
-    ev_genblockmesh.send(GenBlockMeshEvent(ChunkCoords::new(0, 0, 0)));
+    ev_genblockmesh.send(GenBlockMeshEvent(ChunkCoords::new(4, 0, 5)));
 }
 
 #[derive(Event)]
-pub struct GenBlockMeshEvent(ChunkCoords);
+pub struct GenBlockMeshEvent(pub ChunkCoords);
 
 pub fn update_chunk(
     mut ev_genblockmesh: EventReader<GenBlockMeshEvent>,
     mut meshes: ResMut<Assets<Mesh>>,
     mut query: Query<&Handle<Mesh>, With<BlockMesh>>,
+    save_file: Res<SaveFile>,
 ) {
     for ev in ev_genblockmesh.read() {
-        let handle = query.get_single_mut().expect("More than one voxel mesh");
-        if let Some(mesh) = meshes.get_mut(handle.id()) {
-            let mut voxels = [VoxelType::Air; ChunkShape::SIZE as usize];
-            for i in 0..ChunkShape::SIZE {
-                let [x, y, z] = ChunkShape::delinearize(i);
-                if x == 1 || y == 1 || z == 1 {
-                    voxels[i as usize] = VoxelType::Dirt;
+        let mut voxels = [VoxelType::Dirt; ChunkShape::SIZE as usize];
+        for chunk in &save_file.chunk_data.chunks {
+            if let Chunk::Coords(chunk_coords) = &chunk[0] {
+                if *chunk_coords == ev.0 {
+                    if let Chunk::Data(rle_chunk) = &chunk[1] {
+                        let voxel_data = decode_rle(rle_chunk);
+                        for i in 0..ChunkShape::SIZE {
+                            voxels[i as usize] = VoxelType::try_from(voxel_data[i as usize]).unwrap();
+                        }
+                    }
                 }
             }
+        }
 
+        let handle = query.get_single_mut().expect("Error getting block mesh");
+        if let Some(mesh) = meshes.get_mut(handle.id()) {
             *mesh = generate_chunk_mesh(voxels);
         }
     }
+}
+
+fn decode_rle(encoded_data: &Vec<[i32; 2]>) -> Vec<i32> {
+    let mut output = Vec::new();
+    for data in encoded_data {
+        output.extend(vec![data[1]; data[0] as usize]);
+    }
+    output
 }
 
 fn pad_voxels(voxels: [VoxelType; ChunkShape::SIZE as usize]) -> [VoxelType; PaddedChunkShape::SIZE as usize] {
