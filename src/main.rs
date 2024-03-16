@@ -102,7 +102,6 @@ fn editor_ui(
                         current_chunk.0.y = save_file.player.pos[1] as i32 / 16;
                         current_chunk.0.z = save_file.player.pos[2] as i32 / 16;
                         ev_genblockmesh.send(GenBlockMeshEvent);
-                        //*save_file = serde_json::from_reader(reader).unwrap();
                     }
                 }
                 if ui.button("Save").clicked() {

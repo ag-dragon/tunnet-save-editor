@@ -138,11 +138,11 @@ fn generate_chunk_mesh(voxels: [VoxelType; ChunkShape::SIZE as usize]) -> Mesh {
         &mut buffer,
     );
 
-    mesh_from_quads(buffer)
+    mesh_from_quads(buffer, padded_voxels)
 }
 
 // Function heavily inspired by mesh_from_quads function from bevy_voxel_world crate
-fn mesh_from_quads(quads: UnitQuadBuffer) -> Mesh {
+fn mesh_from_quads(quads: UnitQuadBuffer, voxels: [VoxelType; PaddedChunkShape::SIZE as usize]) -> Mesh {
     let num_indices = quads.num_quads() * 6;
     let num_vertices = quads.num_quads() * 4;
 
@@ -166,14 +166,17 @@ fn mesh_from_quads(quads: UnitQuadBuffer) -> Mesh {
 
             normals.extend_from_slice(&face.quad_mesh_normals());
 
+            let voxel= voxels[PaddedChunkShape::linearize(quad.minimum) as usize];
+            let voxel_texture_coords = voxel.atlas_coords();
             tex_coords.extend_from_slice(&face.tex_coords(
                 RIGHT_HANDED_Y_UP_CONFIG.u_flip_face,
                 true,
                 &quad.into(),
             ).map(|coords|
-                coords.map(|coord|
-                    coord / 4.0
-                )
+                [
+                    (coords[0] / 4.0) + voxel_texture_coords[0],
+                    (coords[1] / 4.0) + voxel_texture_coords[1],
+                ]
             ));
         }
     }

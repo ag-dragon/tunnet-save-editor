@@ -68,7 +68,17 @@ impl TryFrom<i32> for VoxelType {
         match value {
             0 => Ok(VoxelType::Air),
             1 => Ok(VoxelType::Dirt),
+            14 => Ok(VoxelType::WoodPlanks),
             _ => Ok(VoxelType::Dirt),
+        }
+    }
+}
+
+impl VoxelType {
+    pub fn atlas_coords(&self) -> [f32; 2] {
+        match self {
+            VoxelType::WoodPlanks => [0.75, 0.50],
+            _ => [0.0, 0.0],
         }
     }
 }
