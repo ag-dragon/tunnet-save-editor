@@ -12,16 +12,16 @@ pub enum VoxelType {
     UnbreakableRock,
     MetalWall,
     Tiles,
-    MetalSheets,
+    MetalSheet,
     GrayBrick,
     Terraforming,
     UnbreakableCobble,
     RedGlyph,
     FlowerGlyph,
     WoodPlanks,
-    Tiles2,
+    TilesAlt,
     CorruptedMetalWall,
-    Air2,
+    Air2, // Appears in front of cook
     Magma,
     Air3,
     WobblyAir1,
@@ -47,7 +47,7 @@ pub enum VoxelType {
     Air5,
     Air6,
     Air7,
-    Air8,
+    Rock,
     DamagedRock,
 }
 
@@ -68,7 +68,19 @@ impl TryFrom<i32> for VoxelType {
         match value {
             0 => Ok(VoxelType::Air),
             1 => Ok(VoxelType::Dirt),
+            6 => Ok(VoxelType::MetalWall),
+            7 => Ok(VoxelType::Tiles),
+            8 => Ok(VoxelType::MetalSheet),
+            13 => Ok(VoxelType::FlowerGlyph),
             14 => Ok(VoxelType::WoodPlanks),
+            15 => Ok(VoxelType::TilesAlt),
+            17 => Ok(VoxelType::Air),
+            19 => Ok(VoxelType::Air),
+            40 => Ok(VoxelType::Air),
+            41 => Ok(VoxelType::Air),
+            42 => Ok(VoxelType::Air),
+            43 => Ok(VoxelType::Rock),
+            44 => Ok(VoxelType::DamagedRock),
             _ => Ok(VoxelType::Dirt),
         }
     }
@@ -77,7 +89,15 @@ impl TryFrom<i32> for VoxelType {
 impl VoxelType {
     pub fn atlas_coords(&self) -> [f32; 2] {
         match self {
+            VoxelType::Dirt => [0.0, 0.0],
+            VoxelType::MetalWall => [0.75, 0.25],
+            VoxelType::Tiles => [0.0, 0.25],
+            VoxelType::MetalSheet => [0.75, 0.0],
+            VoxelType::FlowerGlyph => [0.50, 0.50],
             VoxelType::WoodPlanks => [0.75, 0.50],
+            VoxelType::TilesAlt => [0.50, 0.75],
+            VoxelType::Rock => [0.25, 0.0],
+            VoxelType::DamagedRock => [0.0, 0.75],
             _ => [0.0, 0.0],
         }
     }
