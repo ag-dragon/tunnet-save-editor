@@ -41,6 +41,7 @@ pub struct Node {
 pub enum Infection {
     Hack,
     Bio,
+    StrongBio,
 }
 
 #[derive(Serialize, Deserialize, Debug)]
@@ -142,7 +143,7 @@ pub struct Bridge {
 #[derive(Serialize, Deserialize, Default, Debug)]
 pub struct Network {
     nodes: Vec<Node>,
-    edges: Vec<Vec<[i32; 2]>>,
+    edges: Vec<Vec<Vec<i32>>>,
     endpoints: Vec<Endpoint>,
     relays: Vec<Relay>,
     filters: Vec<Filter>,
