@@ -98,9 +98,9 @@ fn editor_ui(
                             }
                         };
 
-                        current_chunk.0.x = save_file.player.pos[0] as i32 / 16;
-                        current_chunk.0.y = save_file.player.pos[1] as i32 / 16;
-                        current_chunk.0.z = save_file.player.pos[2] as i32 / 16;
+                        current_chunk.0.x = (save_file.player.pos[0] / 16.0).floor() as i32;
+                        current_chunk.0.y = (save_file.player.pos[1] / 16.0).floor() as i32;
+                        current_chunk.0.z = (save_file.player.pos[2] / 16.0).floor() as i32;
                         ev_genblockmesh.send(GenBlockMeshEvent);
                     }
                 }
