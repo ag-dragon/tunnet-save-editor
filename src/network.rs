@@ -150,7 +150,7 @@ pub enum EdgeOptions {
 #[derive(Serialize, Deserialize, Default, Debug)]
 pub struct Network {
     nodes: Vec<Node>,
-    edges: Vec<Vec<Vec<EdgeOptions>>>,
+    edges: Vec<Vec<EdgeOptions>>,
     endpoints: Vec<Endpoint>,
     relays: Vec<Relay>,
     filters: Vec<Filter>,
