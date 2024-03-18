@@ -1,12 +1,14 @@
-mod save_file;
 mod player;
 mod network;
 mod chunks;
 mod chunk_renderer;
+mod voxels;
 
-use save_file::SaveFile;
+use tunnet_save::{
+    save_file::SaveFile,
+    chunks::ChunkCoords,
+};
 use chunk_renderer::{GenBlockMeshEvent};
-use chunks::ChunkCoords;
 
 use bevy::{
     prelude::*,
@@ -28,6 +30,9 @@ enum EditorTab {
 #[derive(Resource, Default)]
 struct CurrentChunk(ChunkCoords);
 
+#[derive(Resource, Default)]
+struct CurrentSave(SaveFile);
+
 fn main() {
     App::new()
         .add_plugins(DefaultPlugins.set(
@@ -38,7 +43,7 @@ fn main() {
         .insert_resource(ClearColor(Color::rgb(0.1, 0.1, 0.1)))
         .insert_resource(WinitSettings::desktop_app())
         .init_resource::<EditorTab>()
-        .init_resource::<SaveFile>()
+        .init_resource::<CurrentSave>()
         .init_resource::<CurrentChunk>()
         .add_event::<chunk_renderer::GenBlockMeshEvent>()
         .add_systems(Startup, chunk_renderer::chunk_setup)
@@ -70,7 +75,7 @@ fn editor_ui_setup(mut contexts: EguiContexts) {
 fn editor_ui(
     mut contexts: EguiContexts,
     mut editor_tab: ResMut<EditorTab>,
-    mut save_file: ResMut<SaveFile>,
+    mut save_file: ResMut<CurrentSave>,
     mut current_chunk: ResMut<CurrentChunk>,
     mut ev_genblockmesh: EventWriter<GenBlockMeshEvent>,
 ) {
@@ -92,15 +97,15 @@ fn editor_ui(
 
                         let deserialize_result = serde_json::from_reader(reader);
                         match deserialize_result {
-                            Ok(result) => *save_file = result,
+                            Ok(result) => save_file.0 = result,
                             Err(e) => {
                                 println!("{:?}", e);
                             }
                         };
 
-                        current_chunk.0.x = (save_file.player.pos[0] / 16.0).floor() as i32;
-                        current_chunk.0.y = (save_file.player.pos[1] / 16.0).floor() as i32;
-                        current_chunk.0.z = (save_file.player.pos[2] / 16.0).floor() as i32;
+                        current_chunk.0.x = (save_file.0.player.pos[0] / 16.0).floor() as i32;
+                        current_chunk.0.y = (save_file.0.player.pos[1] / 16.0).floor() as i32;
+                        current_chunk.0.z = (save_file.0.player.pos[2] / 16.0).floor() as i32;
                         ev_genblockmesh.send(GenBlockMeshEvent);
                     }
                 }
@@ -112,7 +117,7 @@ fn editor_ui(
                             .set_file_name("save.json")
                             .save_file() {
                         let mut file = File::create(path.display().to_string()).unwrap();
-                        file.write_all(serde_json::to_string(&*save_file).unwrap().as_bytes()).unwrap();
+                        file.write_all(serde_json::to_string(&save_file.0).unwrap().as_bytes()).unwrap();
                     }
                 }
             });
@@ -134,7 +139,7 @@ fn editor_ui(
             egui::ScrollArea::vertical().show(ui, |ui| {
                 match *editor_tab {
                     EditorTab::Player => {
-                        player::player_editor(ui, &mut save_file);
+                        player::player_editor(ui, &mut save_file.0);
                     },
                     EditorTab::Network => {
                         network::network_editor(ui);

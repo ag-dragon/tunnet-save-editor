@@ -3,10 +3,9 @@ use crate::player::story::Story;
 use crate::network::Network;
 use crate::chunks::Chunks;
 
-use bevy::ecs::system::Resource;
 use serde::{Serialize, Deserialize};
 
-#[derive(Resource, Serialize, Deserialize, Default, Debug)]
+#[derive(Serialize, Deserialize, Default, Debug)]
 pub struct SaveFile {
     pub player: Player,
     pub story: Story,

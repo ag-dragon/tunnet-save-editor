@@ -1,4 +1,3 @@
-use bevy::ecs::component::Component;
 use block_mesh::{Voxel, VoxelVisibility};
 
 #[derive(Copy, Clone, Debug, PartialEq, Eq, Default)]

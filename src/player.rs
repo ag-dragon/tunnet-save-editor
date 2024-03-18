@@ -5,23 +5,9 @@ pub mod journal;
 pub mod home;
 pub mod guide;
 
-use crate::save_file::SaveFile;
+use tunnet_save::save_file::SaveFile;
 
 use bevy_egui::egui;
-use serde::{Serialize, Deserialize};
-
-#[derive(Serialize, Deserialize, Default, Debug)]
-pub struct Player {
-    pub pos: [f64; 3],
-    credits: i32,
-}
-
-#[derive(Serialize, Deserialize, Default, Debug)]
-pub struct PlayerMovement {
-    movement: bool,
-    look: bool,
-    sprint: bool,
-}
 
 pub fn player_editor(ui: &mut egui::Ui, save_file: &mut SaveFile) {
     ui.vertical_centered(|ui| {

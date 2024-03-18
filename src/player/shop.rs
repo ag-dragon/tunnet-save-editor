@@ -1,31 +1,6 @@
-use bevy_egui::egui;
-use serde::{Serialize, Deserialize};
+use tunnet_save::player::shop::Shop;
 
-#[derive(Serialize, Deserialize, Default, Debug)]
-pub struct Shop {
-    shop_level: i32,
-    digging: bool,
-    relay: bool,
-    hub: bool,
-    filter: bool,
-    scan_short: bool,
-    scan_long: bool,
-    jetpack: bool,
-    antivirus: bool,
-    optical_fiber: bool,
-    antenna: bool,
-    tester: bool,
-    relay_light: bool,
-    patch: bool, //?
-    filter_collision: bool,
-    filter_full_address: bool,
-    tester_repeat: bool,
-    tester_spoof: bool,
-    tester_snoop: bool,
-    scan_short_enhanced: bool,
-    scan_long_peers: bool,
-    auto_map: bool,
-}
+use bevy_egui::egui;
 
 pub fn shop_editor(ui: &mut egui::Ui, shop: &mut Shop) {
     ui.collapsing("Shop Unlocks", |ui| {

@@ -1,11 +1,6 @@
-use bevy_egui::egui;
-use serde::{Serialize, Deserialize};
+use tunnet_save::player::guide::Guide;
 
-#[derive(Serialize, Deserialize, Default, Debug)]
-pub struct Guide {
-    page_no: i32,
-    pages: i32,
-}
+use bevy_egui::egui;
 
 pub fn guide_editor(ui: &mut egui::Ui, guide: &mut Guide) {
     ui.collapsing("Guidebook", |ui| {

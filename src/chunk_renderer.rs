@@ -1,8 +1,8 @@
-use crate::chunks::voxels::VoxelType;
+use crate::voxels::VoxelType;
 
-use crate::CurrentChunk;
-use crate::chunks::{ChunkCoords, Chunk};
-use crate::save_file::SaveFile;
+use crate::{CurrentChunk, CurrentSave};
+
+use tunnet_save::chunks::{ChunkCoords, Chunk};
 
 use bevy::{
     prelude::*,
@@ -21,7 +21,6 @@ use block_mesh::{
     RIGHT_HANDED_Y_UP_CONFIG,
     visible_block_faces,
     UnitQuadBuffer,
-    OrientedBlockFace,
 };
 
 const CHUNK_WIDTH: u32 = 32;
@@ -83,12 +82,12 @@ pub fn update_chunk(
     mut ev_genblockmesh: EventReader<GenBlockMeshEvent>,
     mut meshes: ResMut<Assets<Mesh>>,
     mut query: Query<&Handle<Mesh>, With<BlockMesh>>,
-    save_file: Res<SaveFile>,
+    save_file: Res<CurrentSave>,
     current_chunk: ResMut<CurrentChunk>,
 ) {
     for ev in ev_genblockmesh.read() {
         let mut voxels = [VoxelType::Dirt; ChunkShape::SIZE as usize];
-        for chunk in &save_file.chunk_data.chunks {
+        for chunk in &save_file.0.chunk_data.chunks {
             if let Chunk::Coords(chunk_coords) = &chunk[0] {
                 if *chunk_coords == current_chunk.0 {
                     if let Chunk::Data(rle_chunk) = &chunk[1] {

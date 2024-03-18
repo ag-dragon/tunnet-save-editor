@@ -3,10 +3,14 @@ name = "tunnet-save-editor"
 version = "0.1.0"
 edition = "2021"
 
-# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+[workspace]
+members = ["libs/tunnet_save"]
+
+[dependencies.tunnet_save]
+path = "libs/tunnet_save"
 
 [dependencies]
-bevy = { version = "0.13.0", features = ["dynamic_linking"] }
+bevy = "0.13.0"
 bevy_egui = "0.25"
 bevy_panorbit_camera = "0.16.1"
 block-mesh = "0.2.0"
