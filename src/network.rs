@@ -140,10 +140,17 @@ pub struct Bridge {
     node: i32,
 }
 
+#[derive(Serialize, Deserialize, Debug)]
+#[serde(untagged)]
+pub enum EdgeOptions {
+    Port([i32; 2]),
+    Color(i32),
+}
+
 #[derive(Serialize, Deserialize, Default, Debug)]
 pub struct Network {
     nodes: Vec<Node>,
-    edges: Vec<Vec<Vec<i32>>>,
+    edges: Vec<Vec<Vec<EdgeOptions>>>,
     endpoints: Vec<Endpoint>,
     relays: Vec<Relay>,
     filters: Vec<Filter>,
