@@ -49,6 +49,7 @@ pub fn player_editor(ui: &mut egui::Ui, save_file: &mut SaveFile) {
 
 
     shop::shop_editor(ui, &mut save_file.story.shop);
+    story::story_editor(ui, &mut save_file.story);
     inventory::inventory_editor(ui, &mut save_file.story.inventory);
     journal::journal_editor(ui, &mut save_file.story.knowledge);
     home::home_editor(ui, &mut save_file.story.home);
