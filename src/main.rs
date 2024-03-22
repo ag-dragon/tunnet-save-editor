@@ -1,12 +1,12 @@
-mod chunk_renderer;
-mod voxels;
 mod ui;
+mod chunk_renderer;
 
 use tunnet_save::{
     save_file::SaveFile,
     chunks::ChunkCoords,
 };
 use ui::EditorUiPlugin;
+use chunk_renderer::ChunkRendererPlugin;
 
 use bevy::{
     prelude::*,
@@ -32,9 +32,8 @@ fn main() {
         ))
         .add_plugins((
             EditorUiPlugin,
+            ChunkRendererPlugin,
             PanOrbitCameraPlugin,
         ))
-        .add_systems(Startup, chunk_renderer::chunk_setup)
-        .add_systems(Update, chunk_renderer::update_chunk)
         .run();
 }

@@ -1,4 +1,6 @@
-use crate::voxels::VoxelType;
+mod voxels;
+
+use voxels::VoxelType;
 
 use crate::{CurrentChunk, CurrentSave};
 
@@ -28,10 +30,19 @@ const PADDED_CHUNK_WIDTH: u32 = 34;
 type ChunkShape = ConstShape3u32<CHUNK_WIDTH, CHUNK_WIDTH, CHUNK_WIDTH>;
 type PaddedChunkShape = ConstShape3u32<PADDED_CHUNK_WIDTH, PADDED_CHUNK_WIDTH, PADDED_CHUNK_WIDTH>;
 
+pub struct ChunkRendererPlugin;
+
+impl Plugin for ChunkRendererPlugin {
+    fn build(&self, app: &mut App) {
+        app.add_systems(Startup, chunk_renderer_setup)
+            .add_systems(Update, chunk_renderer_update);
+    }
+}
+
 #[derive(Component)]
 pub struct BlockMesh;
 
-pub fn chunk_setup(
+pub fn chunk_renderer_setup(
     mut commands: Commands,
     asset_server: Res<AssetServer>,
     mut meshes: ResMut<Assets<Mesh>>,
@@ -78,7 +89,7 @@ pub fn chunk_setup(
 #[derive(Event)]
 pub struct GenBlockMeshEvent;
 
-pub fn update_chunk(
+pub fn chunk_renderer_update(
     mut ev_genblockmesh: EventReader<GenBlockMeshEvent>,
     mut meshes: ResMut<Assets<Mesh>>,
     mut query: Query<&Handle<Mesh>, With<BlockMesh>>,
