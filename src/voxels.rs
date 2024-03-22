@@ -52,10 +52,15 @@ pub enum VoxelType {
 
 impl Voxel for VoxelType {
     fn get_visibility(&self) -> VoxelVisibility {
-        if *self == VoxelType::Air {
-            VoxelVisibility::Empty
-        } else {
-            VoxelVisibility::Opaque
+        match *self {
+            VoxelType::Air => VoxelVisibility::Empty,
+            VoxelType::Air2 => VoxelVisibility::Empty,
+            VoxelType::Air3 => VoxelVisibility::Empty,
+            VoxelType::Air4 => VoxelVisibility::Empty,
+            VoxelType::Air5 => VoxelVisibility::Empty,
+            VoxelType::Air6 => VoxelVisibility::Empty,
+            VoxelType::Air7 => VoxelVisibility::Empty,
+            _ => VoxelVisibility::Opaque,
         }
     }
 }
@@ -67,8 +72,10 @@ impl TryFrom<i32> for VoxelType {
         match value {
             0 => Ok(VoxelType::Air),
             1 => Ok(VoxelType::Dirt),
+            2 => Ok(VoxelType::UnbreakableDirt),
             3 => Ok(VoxelType::Grass),
             4 => Ok(VoxelType::UnbreakableGrass),
+            5 => Ok(VoxelType::UnbreakableRock),
             6 => Ok(VoxelType::MetalWall),
             7 => Ok(VoxelType::Tiles),
             8 => Ok(VoxelType::MetalSheet),
@@ -80,11 +87,32 @@ impl TryFrom<i32> for VoxelType {
             14 => Ok(VoxelType::WoodPlanks),
             15 => Ok(VoxelType::TilesAlt),
             16 => Ok(VoxelType::CorruptedMetalWall),
-            17 => Ok(VoxelType::Air),
-            19 => Ok(VoxelType::Air),
-            40 => Ok(VoxelType::Air),
-            41 => Ok(VoxelType::Air),
-            42 => Ok(VoxelType::Air),
+            17 => Ok(VoxelType::Air2),
+            18 => Ok(VoxelType::Magma),
+            19 => Ok(VoxelType::Air3),
+            20 => Ok(VoxelType::WobblyAir1),
+            21 => Ok(VoxelType::WobblyAir2),
+            22 => Ok(VoxelType::Air4),
+            23 => Ok(VoxelType::Watefall1),
+            24 => Ok(VoxelType::Watefall2),
+            25 => Ok(VoxelType::Watefall3),
+            26 => Ok(VoxelType::Watefall4),
+            27 => Ok(VoxelType::Watefall5),
+            28 => Ok(VoxelType::Watefall6),
+            29 => Ok(VoxelType::Watefall7),
+            30 => Ok(VoxelType::Watefall8),
+            31 => Ok(VoxelType::Watefall9),
+            32 => Ok(VoxelType::Watefall10),
+            33 => Ok(VoxelType::Watefall11),
+            34 => Ok(VoxelType::Watefall12),
+            35 => Ok(VoxelType::Watefall13),
+            36 => Ok(VoxelType::Watefall14),
+            37 => Ok(VoxelType::Watefall15),
+            38 => Ok(VoxelType::Watefall16),
+            39 => Ok(VoxelType::UnbreakableRock2),
+            40 => Ok(VoxelType::Air5),
+            41 => Ok(VoxelType::Air6),
+            42 => Ok(VoxelType::Air7),
             43 => Ok(VoxelType::Rock),
             44 => Ok(VoxelType::DamagedRock),
             _ => Ok(VoxelType::Dirt),
