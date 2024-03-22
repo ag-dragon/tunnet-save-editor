@@ -35,20 +35,27 @@ struct CurrentSave(SaveFile);
 
 fn main() {
     App::new()
-        .add_plugins(DefaultPlugins.set(
-            ImagePlugin::default_nearest(),
-        ))
-        .add_plugins(EguiPlugin)
-        .add_plugins(PanOrbitCameraPlugin)
-        .insert_resource(ClearColor(Color::rgb(0.1, 0.1, 0.1)))
-        .insert_resource(WinitSettings::desktop_app())
         .init_resource::<EditorTab>()
         .init_resource::<CurrentSave>()
         .init_resource::<CurrentChunk>()
+        .insert_resource(ClearColor(Color::rgb(0.1, 0.1, 0.1)))
+        .insert_resource(WinitSettings::desktop_app())
         .add_event::<chunk_renderer::GenBlockMeshEvent>()
-        .add_systems(Startup, chunk_renderer::chunk_setup)
-        .add_systems(Startup, editor_ui_setup)
-        .add_systems(Update, (editor_ui, chunk_renderer::update_chunk))
+        .add_plugins(DefaultPlugins.set(
+            ImagePlugin::default_nearest(),
+        ))
+        .add_plugins((
+            EguiPlugin,
+            PanOrbitCameraPlugin,
+        ))
+        .add_systems(Startup, (
+            chunk_renderer::chunk_setup,
+            editor_ui_setup,
+        ))
+        .add_systems(Update, (
+            editor_ui,
+            chunk_renderer::update_chunk
+        ))
         .run();
 }
 
