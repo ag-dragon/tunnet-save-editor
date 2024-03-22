@@ -6,7 +6,6 @@ use tunnet_save::{
     save_file::SaveFile,
     chunks::ChunkCoords,
 };
-use chunk_renderer::{GenBlockMeshEvent};
 use ui::EditorUiPlugin;
 
 use bevy::{

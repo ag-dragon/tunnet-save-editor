@@ -2,7 +2,7 @@ use crate::voxels::VoxelType;
 
 use crate::{CurrentChunk, CurrentSave};
 
-use tunnet_save::chunks::{ChunkCoords, Chunk};
+use tunnet_save::chunks::Chunk;
 
 use bevy::{
     prelude::*,
@@ -85,7 +85,7 @@ pub fn update_chunk(
     save_file: Res<CurrentSave>,
     current_chunk: ResMut<CurrentChunk>,
 ) {
-    for ev in ev_genblockmesh.read() {
+    for _ in ev_genblockmesh.read() {
         let mut voxels = [VoxelType::Dirt; ChunkShape::SIZE as usize];
         for chunk in &save_file.0.chunk_data.chunks {
             if let Chunk::Coords(chunk_coords) = &chunk[0] {
@@ -153,16 +153,8 @@ fn mesh_from_quads(quads: UnitQuadBuffer, voxels: [VoxelType; PaddedChunkShape::
     for (group, face)  in quads.groups.into_iter()
             .zip(RIGHT_HANDED_Y_UP_CONFIG.faces.into_iter()) {
         for quad in group.into_iter() {
-            let normal = IVec3::from([
-                face.signed_normal().x,
-                face.signed_normal().y,
-                face.signed_normal().z,
-            ]);
-
             indices.extend_from_slice(&face.quad_mesh_indices(positions.len() as u32));
-
             positions.extend_from_slice(&face.quad_mesh_positions(&quad.into(), 1.0));
-
             normals.extend_from_slice(&face.quad_mesh_normals());
 
             let voxel= voxels[PaddedChunkShape::linearize(quad.minimum) as usize];
