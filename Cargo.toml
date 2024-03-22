@@ -4,10 +4,10 @@ version = "0.1.0"
 edition = "2021"
 
 [workspace]
-members = ["libs/tunnet_save"]
+members = ["crates/tunnet_save"]
 
 [dependencies.tunnet_save]
-path = "libs/tunnet_save"
+path = "crates/tunnet_save"
 
 [dependencies]
 bevy = "0.13.0"
