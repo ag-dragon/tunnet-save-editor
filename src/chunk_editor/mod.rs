@@ -1,5 +1,7 @@
 mod voxels;
+mod camera;
 
+use camera::CameraPlugin;
 use voxels::VoxelType;
 
 use crate::{CurrentChunk, CurrentSave};
@@ -17,7 +19,6 @@ use bevy::{
         },
     },
 };
-use bevy_panorbit_camera::PanOrbitCamera;
 use block_mesh::{
     ndshape::{ConstShape, ConstShape3u32},
     RIGHT_HANDED_Y_UP_CONFIG,
@@ -30,19 +31,20 @@ const PADDED_CHUNK_WIDTH: u32 = 34;
 type ChunkShape = ConstShape3u32<CHUNK_WIDTH, CHUNK_WIDTH, CHUNK_WIDTH>;
 type PaddedChunkShape = ConstShape3u32<PADDED_CHUNK_WIDTH, PADDED_CHUNK_WIDTH, PADDED_CHUNK_WIDTH>;
 
-pub struct ChunkRendererPlugin;
+pub struct ChunkEditorPlugin;
 
-impl Plugin for ChunkRendererPlugin {
+impl Plugin for ChunkEditorPlugin {
     fn build(&self, app: &mut App) {
-        app.add_systems(Startup, chunk_renderer_setup)
-            .add_systems(Update, chunk_renderer_update);
+        app.add_plugins(CameraPlugin)
+            .add_systems(Startup, chunk_editor_setup)
+            .add_systems(Update, chunk_editor_update);
     }
 }
 
 #[derive(Component)]
 pub struct BlockMesh;
 
-pub fn chunk_renderer_setup(
+pub fn chunk_editor_setup(
     mut commands: Commands,
     asset_server: Res<AssetServer>,
     mut meshes: ResMut<Assets<Mesh>>,
@@ -56,6 +58,7 @@ pub fn chunk_renderer_setup(
     });
 
     // camera
+    /*
     commands.spawn((
         Camera3dBundle {
             transform: Transform::from_xyz(32.0, 64.0, 64.0),
@@ -66,6 +69,7 @@ pub fn chunk_renderer_setup(
             ..default()
         }
     ));
+    */
 
 
     let custom_texture_handle: Handle<Image> = asset_server.load("textures/array_texture.png");
@@ -89,7 +93,7 @@ pub fn chunk_renderer_setup(
 #[derive(Event)]
 pub struct GenBlockMeshEvent;
 
-pub fn chunk_renderer_update(
+pub fn chunk_editor_update(
     mut ev_genblockmesh: EventReader<GenBlockMeshEvent>,
     mut meshes: ResMut<Assets<Mesh>>,
     mut query: Query<&Handle<Mesh>, With<BlockMesh>>,

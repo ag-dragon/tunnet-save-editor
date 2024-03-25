@@ -1,4 +1,4 @@
-use crate::chunk_renderer::GenBlockMeshEvent;
+use crate::chunk_editor::GenBlockMeshEvent;
 use crate::CurrentChunk;
 
 use bevy::prelude::*;

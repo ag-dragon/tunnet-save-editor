@@ -1,18 +1,14 @@
 mod ui;
-mod chunk_renderer;
+mod chunk_editor;
 
 use tunnet_save::{
     save_file::SaveFile,
     chunks::ChunkCoords,
 };
 use ui::EditorUiPlugin;
-use chunk_renderer::ChunkRendererPlugin;
+use chunk_editor::{ChunkEditorPlugin, GenBlockMeshEvent};
 
-use bevy::{
-    prelude::*,
-    winit::WinitSettings,
-};
-use bevy_panorbit_camera::PanOrbitCameraPlugin;
+use bevy::prelude::*;
 
 #[derive(Resource, Default)]
 struct CurrentChunk(ChunkCoords);
@@ -25,15 +21,13 @@ fn main() {
         .init_resource::<CurrentSave>()
         .init_resource::<CurrentChunk>()
         .insert_resource(ClearColor(Color::rgb(0.1, 0.1, 0.1)))
-        .insert_resource(WinitSettings::desktop_app())
-        .add_event::<chunk_renderer::GenBlockMeshEvent>()
+        .add_event::<GenBlockMeshEvent>()
         .add_plugins(DefaultPlugins.set(
             ImagePlugin::default_nearest(),
         ))
         .add_plugins((
             EditorUiPlugin,
-            ChunkRendererPlugin,
-            PanOrbitCameraPlugin,
+            ChunkEditorPlugin,
         ))
         .run();
 }

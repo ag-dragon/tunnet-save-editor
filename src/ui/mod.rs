@@ -2,7 +2,7 @@ mod player;
 mod network;
 mod chunks;
 
-use crate::chunk_renderer::{GenBlockMeshEvent};
+use crate::chunk_editor::{GenBlockMeshEvent};
 use crate::{CurrentChunk, CurrentSave};
 
 use bevy::prelude::*;
