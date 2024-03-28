@@ -12,6 +12,7 @@ path = "crates/tunnet_save"
 [dependencies]
 bevy = "0.13.0"
 bevy_egui = "0.25"
+bevy_mod_raycast = "0.17.0"
 bevy_panorbit_camera = "0.16.1"
 block-mesh = "0.2.0"
 rfd = "0.13.0"

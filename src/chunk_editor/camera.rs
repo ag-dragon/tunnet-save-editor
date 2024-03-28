@@ -2,6 +2,7 @@ use bevy::{
     prelude::*,
     input::mouse::MouseMotion,
 };
+use bevy_mod_raycast::prelude::*;
 
 #[derive(Resource)]
 pub struct CameraSettings {
@@ -27,6 +28,7 @@ impl Plugin for CameraPlugin {
             .add_systems(Update, (
                 camera_move,
                 camera_look,
+                camera_edit,
             ));
     }
 }
@@ -94,6 +96,29 @@ fn camera_look(
             pitch = pitch.clamp(-1.54, 1.54);
 
             camera_transform.rotation = Quat::from_axis_angle(Vec3::Y, yaw) * Quat::from_axis_angle(Vec3::X, pitch);
+        }
+    }
+}
+
+fn camera_edit(
+    mouse_buttons: Res<ButtonInput<MouseButton>>,
+    mut raycast: Raycast,
+    mut gizmos: Gizmos,
+    mut query: Query<&Transform, With<Camera>>,
+) {
+    let camera_transform = query.get_single_mut().expect("error getting camera entity");
+
+    if mouse_buttons.pressed(MouseButton::Left) {
+        let pos = camera_transform.translation;
+        let dir = -camera_transform.local_z();
+        let intersections = raycast.debug_cast_ray(Ray3d::new(pos, Vec3::from(dir)), &default(), &mut gizmos);
+        if intersections.len() > 0 {
+            let intersection = &intersections[0].1;
+            let position = intersection.position() - (intersection.normal() * 0.1);
+            gizmos.cuboid(
+                Transform::from_xyz(position.x.floor()+0.5, position.y.floor()+0.5, position.z.floor()+0.5),
+                Color::RED,
+            );
         }
     }
 }
