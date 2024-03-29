@@ -98,7 +98,7 @@ pub fn chunk_editor_update(
     mut meshes: ResMut<Assets<Mesh>>,
     mut query: Query<&Handle<Mesh>, With<BlockMesh>>,
     save_file: Res<CurrentSave>,
-    current_chunk: ResMut<CurrentChunk>,
+    current_chunk: Res<CurrentChunk>,
 ) {
     for _ in ev_genblockmesh.read() {
         let mut voxels = [VoxelType::Dirt; ChunkShape::SIZE as usize];
@@ -122,11 +122,32 @@ pub fn chunk_editor_update(
     }
 }
 
-fn decode_rle(encoded_data: &Vec<[i32; 2]>) -> Vec<i32> {
+pub fn decode_rle(encoded_data: &Vec<[i32; 2]>) -> Vec<i32> {
     let mut output = Vec::new();
     for data in encoded_data {
         output.extend(vec![data[1]; data[0] as usize]);
     }
+    output
+}
+
+pub fn encode_rle(data: &Vec<i32>) -> Vec<[i32; 2]> {
+    let mut output = Vec::new();
+    let mut current_run: [i32; 2] = [0, 0];
+    for voxel in data {
+        if current_run[0] == 0 {
+            current_run[0] = 1;
+            current_run[1] = *voxel;
+        } else {
+            if current_run[1] == *voxel {
+                current_run[0] += 1;
+            } else {
+                output.push(current_run);
+                current_run = [1, *voxel];
+            }
+        }
+    }
+    output.push(current_run);
+
     output
 }
 

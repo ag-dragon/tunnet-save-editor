@@ -1,3 +1,7 @@
+use crate::{CurrentChunk, CurrentSave, GenBlockMeshEvent};
+
+use tunnet_save::chunks::Chunk;
+
 use bevy::{
     prelude::*,
     input::mouse::MouseMotion,
@@ -105,10 +109,13 @@ fn camera_edit(
     mut raycast: Raycast,
     mut gizmos: Gizmos,
     mut query: Query<&Transform, With<Camera>>,
+    mut save_file: ResMut<CurrentSave>,
+    current_chunk: Res<CurrentChunk>,
+    mut ev_genblockmesh: EventWriter<GenBlockMeshEvent>,
 ) {
     let camera_transform = query.get_single_mut().expect("error getting camera entity");
 
-    if mouse_buttons.pressed(MouseButton::Left) {
+    if mouse_buttons.just_pressed(MouseButton::Left) {
         let pos = camera_transform.translation;
         let dir = -camera_transform.local_z();
         let intersections = raycast.debug_cast_ray(Ray3d::new(pos, Vec3::from(dir)), &default(), &mut gizmos);
@@ -119,6 +126,19 @@ fn camera_edit(
                 Transform::from_xyz(position.x.floor()+0.5, position.y.floor()+0.5, position.z.floor()+0.5),
                 Color::RED,
             );
+
+            for chunk in &mut save_file.0.chunk_data.chunks {
+                if let Chunk::Coords(chunk_coords) = &chunk[0] {
+                    if *chunk_coords == current_chunk.0 {
+                        if let Chunk::Data(rle_chunk) = &chunk[1] {
+                            let mut voxel_data = super::decode_rle(rle_chunk);
+                            voxel_data[0] = 0;
+                            chunk[1] = Chunk::Data(super::encode_rle(&voxel_data));
+                            ev_genblockmesh.send(GenBlockMeshEvent);
+                        }
+                    }
+                }
+            }
         }
     }
 }
