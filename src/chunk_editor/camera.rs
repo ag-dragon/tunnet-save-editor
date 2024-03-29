@@ -1,4 +1,5 @@
 use crate::{CurrentChunk, CurrentSave, GenBlockMeshEvent};
+use crate::chunk_editor::ChunkShape;
 
 use tunnet_save::chunks::Chunk;
 
@@ -7,6 +8,7 @@ use bevy::{
     input::mouse::MouseMotion,
 };
 use bevy_mod_raycast::prelude::*;
+use block_mesh::ndshape::{ConstShape, ConstShape3u32};
 
 #[derive(Resource)]
 pub struct CameraSettings {
@@ -132,7 +134,14 @@ fn camera_edit(
                     if *chunk_coords == current_chunk.0 {
                         if let Chunk::Data(rle_chunk) = &chunk[1] {
                             let mut voxel_data = super::decode_rle(rle_chunk);
-                            voxel_data[0] = 0;
+
+                            
+                            voxel_data[ChunkShape::linearize([
+                                (position.x - 1.0).floor() as u32,
+                                (position.y - 1.0).floor() as u32,
+                                (position.z - 1.0).floor() as u32,
+                            ]) as usize] = 0;
+
                             chunk[1] = Chunk::Data(super::encode_rle(&voxel_data));
                             ev_genblockmesh.send(GenBlockMeshEvent);
                         }
