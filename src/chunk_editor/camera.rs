@@ -1,5 +1,5 @@
-use crate::{CurrentChunk, CurrentSave, GenBlockMeshEvent};
-use crate::chunk_editor::ChunkShape;
+use crate::{CurrentSave, GenBlockMeshEvent};
+use crate::chunk_editor::{ChunkShape, CurrentChunk};
 
 use tunnet_save::chunks::Chunk;
 
@@ -8,7 +8,7 @@ use bevy::{
     input::mouse::MouseMotion,
 };
 use bevy_mod_raycast::prelude::*;
-use block_mesh::ndshape::{ConstShape, ConstShape3u32};
+use block_mesh::ndshape::ConstShape;
 
 #[derive(Resource)]
 pub struct CameraSettings {

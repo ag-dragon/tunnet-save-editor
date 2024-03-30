@@ -4,9 +4,9 @@ mod camera;
 use camera::CameraPlugin;
 use voxels::VoxelType;
 
-use crate::{CurrentChunk, CurrentSave};
+use crate::CurrentSave;
 
-use tunnet_save::chunks::Chunk;
+use tunnet_save::chunks::{Chunk, ChunkCoords};
 
 use bevy::{
     prelude::*,
@@ -31,11 +31,15 @@ const PADDED_CHUNK_WIDTH: u32 = 34;
 type ChunkShape = ConstShape3u32<CHUNK_WIDTH, CHUNK_WIDTH, CHUNK_WIDTH>;
 type PaddedChunkShape = ConstShape3u32<PADDED_CHUNK_WIDTH, PADDED_CHUNK_WIDTH, PADDED_CHUNK_WIDTH>;
 
+#[derive(Resource, Default)]
+pub struct CurrentChunk(pub ChunkCoords);
+
 pub struct ChunkEditorPlugin;
 
 impl Plugin for ChunkEditorPlugin {
     fn build(&self, app: &mut App) {
-        app.add_plugins(CameraPlugin)
+        app.init_resource::<CurrentChunk>()
+            .add_plugins(CameraPlugin)
             .add_systems(Startup, chunk_editor_setup)
             .add_systems(Update, chunk_editor_update);
     }

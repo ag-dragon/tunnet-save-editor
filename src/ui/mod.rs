@@ -2,8 +2,8 @@ mod player;
 mod network;
 mod chunks;
 
-use crate::chunk_editor::{GenBlockMeshEvent};
-use crate::{CurrentChunk, CurrentSave};
+use crate::chunk_editor::{GenBlockMeshEvent, CurrentChunk};
+use crate::CurrentSave;
 
 use bevy::prelude::*;
 use bevy_egui::{egui, EguiContexts, EguiPlugin};

@@ -1,5 +1,4 @@
-use crate::chunk_editor::GenBlockMeshEvent;
-use crate::CurrentChunk;
+use crate::chunk_editor::{GenBlockMeshEvent, CurrentChunk};
 
 use bevy::prelude::*;
 use bevy_egui::egui;
