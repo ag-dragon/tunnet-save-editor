@@ -6,7 +6,7 @@ use voxels::VoxelType;
 
 use crate::CurrentSave;
 
-use tunnet_save::chunks::{Chunk, ChunkCoords};
+use tunnet_save::chunks::ChunkCoords;
 
 use bevy::{
     prelude::*,
@@ -106,17 +106,14 @@ pub fn chunk_editor_update(
 ) {
     for _ in ev_genblockmesh.read() {
         let mut voxels = [VoxelType::Dirt; ChunkShape::SIZE as usize];
-        for chunk in &save_file.0.chunk_data.chunks {
-            if let Chunk::Coords(chunk_coords) = &chunk[0] {
-                if *chunk_coords == current_chunk.0 {
-                    if let Chunk::Data(rle_chunk) = &chunk[1] {
-                        let voxel_data = decode_rle(rle_chunk);
-                        for i in 0..ChunkShape::SIZE {
-                            voxels[i as usize] = VoxelType::try_from(voxel_data[i as usize]).unwrap();
-                        }
-                    }
+        match save_file.0.chunk_data.chunks.get(&current_chunk.0) {
+            Some(rle_chunk) => {
+                let voxel_data = decode_rle(rle_chunk);
+                for i in 0..ChunkShape::SIZE {
+                    voxels[i as usize] = VoxelType::try_from(voxel_data[i as usize]).unwrap();
                 }
-            }
+            },
+            None => {},
         }
 
         let handle = query.get_single_mut().expect("Error getting block mesh");

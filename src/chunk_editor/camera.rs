@@ -1,8 +1,6 @@
 use crate::{CurrentSave, GenBlockMeshEvent};
 use crate::chunk_editor::{ChunkShape, CurrentChunk};
 
-use tunnet_save::chunks::Chunk;
-
 use bevy::{
     prelude::*,
     input::mouse::MouseMotion,
@@ -129,24 +127,21 @@ fn camera_edit(
                 Color::RED,
             );
 
-            for chunk in &mut save_file.0.chunk_data.chunks {
-                if let Chunk::Coords(chunk_coords) = &chunk[0] {
-                    if *chunk_coords == current_chunk.0 {
-                        if let Chunk::Data(rle_chunk) = &chunk[1] {
-                            let mut voxel_data = super::decode_rle(rle_chunk);
+            match save_file.0.chunk_data.chunks.get_mut(&current_chunk.0) {
+                Some(rle_chunk) => {
+                    let mut voxel_data = super::decode_rle(rle_chunk);
 
-                            
-                            voxel_data[ChunkShape::linearize([
-                                (position.x - 1.0).floor() as u32,
-                                (position.y - 1.0).floor() as u32,
-                                (position.z - 1.0).floor() as u32,
-                            ]) as usize] = 0;
+                    
+                    voxel_data[ChunkShape::linearize([
+                        (position.x - 1.0).floor() as u32,
+                        (position.y - 1.0).floor() as u32,
+                        (position.z - 1.0).floor() as u32,
+                    ]) as usize] = 0;
 
-                            chunk[1] = Chunk::Data(super::encode_rle(&voxel_data));
-                            ev_genblockmesh.send(GenBlockMeshEvent);
-                        }
-                    }
-                }
+                    *rle_chunk = super::encode_rle(&voxel_data);
+                    ev_genblockmesh.send(GenBlockMeshEvent);
+                },
+                None => {},
             }
         }
     }
