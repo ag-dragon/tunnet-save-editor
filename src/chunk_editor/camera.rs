@@ -107,7 +107,6 @@ fn camera_look(
 fn camera_edit(
     mouse_buttons: Res<ButtonInput<MouseButton>>,
     mut raycast: Raycast,
-    mut gizmos: Gizmos,
     mut query: Query<&Transform, With<Camera>>,
     mut save_file: ResMut<CurrentSave>,
     current_chunk: Res<CurrentChunk>,
@@ -118,24 +117,19 @@ fn camera_edit(
     if mouse_buttons.just_pressed(MouseButton::Left) {
         let pos = camera_transform.translation;
         let dir = -camera_transform.local_z();
-        let intersections = raycast.debug_cast_ray(Ray3d::new(pos, Vec3::from(dir)), &default(), &mut gizmos);
+        let intersections = raycast.cast_ray(Ray3d::new(pos, Vec3::from(dir)), &default());
         if intersections.len() > 0 {
             let intersection = &intersections[0].1;
             let position = intersection.position() - (intersection.normal() * 0.1);
-            gizmos.cuboid(
-                Transform::from_xyz(position.x.floor()+0.5, position.y.floor()+0.5, position.z.floor()+0.5),
-                Color::RED,
-            );
 
             match save_file.0.chunk_data.chunks.get_mut(&current_chunk.0) {
                 Some(rle_chunk) => {
                     let mut voxel_data = super::decode_rle(rle_chunk);
 
-                    
                     voxel_data[ChunkShape::linearize([
-                        (position.x - 1.0).floor() as u32,
-                        (position.y - 1.0).floor() as u32,
-                        (position.z - 1.0).floor() as u32,
+                        (position.x - 1.01).floor() as u32,
+                        (position.y - 1.01).floor() as u32,
+                        (position.z - 1.01).floor() as u32,
                     ]) as usize] = 0;
 
                     *rle_chunk = super::encode_rle(&voxel_data);
